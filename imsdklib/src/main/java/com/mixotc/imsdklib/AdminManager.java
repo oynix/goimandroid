@@ -1,8 +1,10 @@
 package com.mixotc.imsdklib;
 
 import android.content.Context;
+import android.os.RemoteException;
 
-import com.mixotc.imsdklib.service.AgentService;
+import com.mixotc.imsdklib.listener.RemoteCallBack;
+import com.mixotc.imsdklib.service.RemoteService;
 
 /**
  * Author   : xiaoyu
@@ -13,6 +15,8 @@ import com.mixotc.imsdklib.service.AgentService;
  * 该类是单例，是整个IM SDK的管理者，所有的操作均需要通过该类提供的方法调用。
  */
 public final class AdminManager {
+
+    private static final String TAG = AdminManager.class.getSimpleName();
 
     private BindServiceHelper mBindServiceHelper;
 
@@ -30,9 +34,22 @@ public final class AdminManager {
     /**
      * 主进程application创建时进行初始化，启动远程服务service
      */
-    public void initOnAppCreate(Context context, Class<? extends AgentService> service) {
+    public void initOnAppCreate(Context context, Class<? extends RemoteService> service) {
         mBindServiceHelper = new BindServiceHelper(context, service);
         mBindServiceHelper.bind();
     }
 
+    /**
+     * 获取登录验证码
+     */
+    public void sendLoginCode(String phone, String email, RemoteCallBack callBack) {
+        RemoteServiceBinder binder = mBindServiceHelper.getBinder();
+        if (binder == null)
+            return;
+        try {
+            binder.sendCode(phone, email, callBack);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
 }

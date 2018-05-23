@@ -7,6 +7,7 @@ import com.mixotc.imsdklib.error.ErrorType;
 import com.mixotc.imsdklib.listener.ChannelConnectionListener;
 import com.mixotc.imsdklib.listener.PacketReceivedListener;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
+import com.mixotc.imsdklib.listener.RemoteConnectionListener;
 import com.mixotc.imsdklib.packet.BasePacket;
 import com.mixotc.imsdklib.packet.PacketDecoder;
 import com.mixotc.imsdklib.packet.PacketEncoder;
@@ -16,6 +17,10 @@ import com.mixotc.imsdklib.utils.NetUtils;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -58,6 +63,9 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
     private boolean mConnected = false;
     private boolean mLogin = false;
     private ReconnectTask mReconnectThread;
+    private List<PacketReceivedListener> mPacketReceivedListeners = new ArrayList<>();
+    private List<RemoteConnectionListener> mRemoteConnectionListeners = new ArrayList<>();
+    private ExecutorService mListenerExecutor = Executors.newSingleThreadExecutor();
 
     public void init(Context context) {
         mContext = context;
@@ -66,9 +74,9 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
     /**
      * 主动建立与服务器的socket连接
      */
-    public void connect() {
+    public boolean connect() {
         if (mChannel != null && mChannel.isActive()) {
-            return;
+            return true;
         }
         if (mBootstrap == null) {
             mWorkerGroup = new NioEventLoopGroup();
@@ -98,7 +106,9 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
             future.addListener(mConnectFutureListener);
         } catch (UnknownHostException e) {
             e.printStackTrace();
+            return false;
         }
+        return true;
     }
 
     private ChannelFutureListener mConnectFutureListener = new ChannelFutureListener() {
@@ -160,32 +170,45 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
     }
 
     /**
+     * 向服务器发送packet,要求已登陆状态
+     *
+     * @param pkt      packet实例
+     * @param callBack 发送回调
+     */
+    public void writeAndFlushPacket(BasePacket pkt, RemoteCallBack callBack) {
+        writeAndFlushPacket(pkt, callBack, true);
+    }
+
+    /**
      * 向服务器发送packet
      *
      * @param pkt      packet实例
      * @param callBack 发送回调
-     * @throws RemoteException 可能抛出的异常
      */
-    public void writeAndFlushPacket(BasePacket pkt, RemoteCallBack callBack) throws RemoteException {
+    public void writeAndFlushPacket(BasePacket pkt, RemoteCallBack callBack, boolean isLoginNeed) {
         if (!mConnected) {
-            if (callBack != null) {
-                callBack.onError(ErrorType.ERROR_EXCEPTION_NO_CONNECTION_ERROR, null);
-            }
+            callbackOnError(callBack, ErrorType.ERROR_EXCEPTION_NO_CONNECTION_ERROR, null);
             return;
         }
-        if (!mLogin) {
-            if (callBack != null) {
-                callBack.onError(ErrorType.ERROR_EXCEPTION_NO_LOGIN_ERROR, null);
-            }
+        if (isLoginNeed && !mLogin) {
+            callbackOnError(callBack, ErrorType.ERROR_EXCEPTION_NO_LOGIN_ERROR, null);
             return;
         }
         if (!doChannelCheck()) {
-            if (callBack != null) {
-                callBack.onError(ErrorType.ERROR_EXCEPTION_SERVER_CONNECTION, "");
-            }
+            callbackOnError(callBack, ErrorType.ERROR_EXCEPTION_SERVER_CONNECTION, null);
             return;
         }
         mChannel.writeAndFlush(pkt);
+    }
+
+    private void callbackOnError(RemoteCallBack callBack, int code, String reason) {
+        if (callBack != null) {
+            try {
+                callBack.onError(code, reason);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private boolean doChannelCheck() {
@@ -203,26 +226,93 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
         }
         return true;
     }
+
+    /**
+     * 添加packet接收监听器
+     */
+    public void addPacketListener(PacketReceivedListener l) {
+        if (l != null && !mPacketReceivedListeners.contains(l)) {
+            mPacketReceivedListeners.add(l);
+        }
+    }
+
+    /**
+     * 移除packet接收监听器
+     */
+    public void removePacketListener(PacketReceivedListener l) {
+        mPacketReceivedListeners.remove(l);
+    }
+
+    /**
+     * 添加连接状态监听器
+     */
+    public void addConnectionListener(RemoteConnectionListener l) {
+        if (l != null && !mRemoteConnectionListeners.contains(l)) {
+            mRemoteConnectionListeners.add(l);
+        }
+    }
+
+    /**
+     * 移除连接状态监听器
+     */
+    public void removeConnectionListener(RemoteConnectionListener l) {
+        mRemoteConnectionListeners.remove(l);
+    }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
     public void onChannelConnected() {
-
+        for (RemoteConnectionListener listener : mRemoteConnectionListeners) {
+            try {
+                listener.onConnected();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
     public void onChannelDisconnected() {
-
+        for (RemoteConnectionListener listener : mRemoteConnectionListeners) {
+            try {
+                listener.onDisconnected();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
     public void onChannelError(String reason) {
-
+        for (RemoteConnectionListener listener : mRemoteConnectionListeners) {
+            try {
+                listener.onError(reason);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
+    // 每接收到一个packet，就要遍历所有listener分别执行处理packet
     @Override
     public void onReceivedPacket(BasePacket packet) {
+        mListenerExecutor.submit(new PacketListenerNotification(packet));
+    }
 
+    private class PacketListenerNotification implements Runnable {
+
+        private BasePacket packet;
+
+        PacketListenerNotification(BasePacket packet) {
+            this.packet = packet;
+        }
+
+        @Override
+        public void run() {
+            for (PacketReceivedListener listener : mPacketReceivedListeners) {
+                listener.onReceivedPacket(packet);
+            }
+        }
     }
 
     class ReconnectTask extends Thread {

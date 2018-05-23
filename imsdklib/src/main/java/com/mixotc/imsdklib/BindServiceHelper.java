@@ -6,7 +6,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
-import com.mixotc.imsdklib.service.AgentService;
+import com.mixotc.imsdklib.service.RemoteService;
+import com.mixotc.imsdklib.utils.Logger;
 
 import static android.content.Context.BIND_AUTO_CREATE;
 
@@ -14,17 +15,20 @@ import static android.content.Context.BIND_AUTO_CREATE;
  * Author   : xiaoyu
  * Date     : 2018/5/23 下午1:34
  * Version  : v1.0.0
- * Describe :
+ * Describe : 绑定远程服务到主进程的辅助类
  */
 public class BindServiceHelper {
 
+    private static final String TAG = BindServiceHelper.class.getSimpleName();
+
     private Context mContext;
-    private Class<? extends AgentService> mServiceClass;
+    private Class<? extends RemoteService> mServiceClass;
     private RemoteServiceBinder mServiceBinder;
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mServiceBinder = RemoteServiceBinder.Stub.asInterface(service);
+            Logger.d(TAG, "on service connect:" + (mServiceBinder == null));
         }
 
         @Override
@@ -32,7 +36,7 @@ public class BindServiceHelper {
         }
     };
 
-    BindServiceHelper(Context context, Class<? extends AgentService> service) {
+    BindServiceHelper(Context context, Class<? extends RemoteService> service) {
         mContext = context;
         mServiceClass = service;
     }
@@ -62,5 +66,9 @@ public class BindServiceHelper {
             Intent intent = new Intent(mContext, mServiceClass);
             mContext.stopService(intent);
         }
+    }
+
+    public RemoteServiceBinder getBinder() {
+        return mServiceBinder;
     }
 }

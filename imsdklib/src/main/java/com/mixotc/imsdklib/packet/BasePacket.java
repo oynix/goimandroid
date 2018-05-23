@@ -31,9 +31,9 @@ public class BasePacket implements Parcelable {
     }
 
     private long mVersion;
-    private PacketType mType;
+    protected PacketType mType;
     private long mPacketId;
-    private byte[] mPacketBody;
+    protected byte[] mPacketBody;
 
     private static long sNextPacketId = 0L;
 

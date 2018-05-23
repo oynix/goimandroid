@@ -1,6 +1,6 @@
 package com.mixotc.goimandroid;
 
-import com.mixotc.imsdklib.service.AgentService;
+import com.mixotc.imsdklib.service.RemoteService;
 
 /**
  * Author   : xiaoyu
@@ -8,5 +8,5 @@ import com.mixotc.imsdklib.service.AgentService;
  * Version  : v1.0.0
  * Describe :
  */
-public class LocalService extends AgentService {
+public class LocalService extends RemoteService {
 }

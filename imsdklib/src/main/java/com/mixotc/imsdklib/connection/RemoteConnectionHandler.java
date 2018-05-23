@@ -28,7 +28,7 @@ public class RemoteConnectionHandler extends SimpleChannelInboundHandler<BasePac
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, BasePacket packet) throws Exception {
-        Logger.d(TAG, "接收packet：");
+        Logger.d(TAG, "接收packet：" + "id:" + packet.getPacketId() + ",type:" + packet.getPacketType().name() + "," + packet.toString());
         if (mPacketReceivedListener != null) {
             mPacketReceivedListener.onReceivedPacket(packet);
         }

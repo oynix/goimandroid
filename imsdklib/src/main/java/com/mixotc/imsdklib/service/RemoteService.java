@@ -13,16 +13,16 @@ import com.mixotc.imsdklib.utils.Logger;
  * Version  : v1.0.0
  * Describe : 在非主进程运行的Service，用来链接主进程和服务进程
  */
-public class AgentService extends Service {
+public class RemoteService extends Service {
 
-    private static final String TAG = AgentService.class.getSimpleName();
+    private static final String TAG = RemoteService.class.getSimpleName();
 
-    private AgentBinder mBinder = new AgentBinder();
+    private RemoteBinder mBinder = new RemoteBinder();
 
     public void onCreate() {
         super.onCreate();
         Logger.d(TAG, "chat service created");
-//        RemoteServiceInitializer.getInstance().init(this);
+        RemoteInitializer.getInstance().init(this);
     }
 
     public int onStartCommand(Intent paramIntent, int paramInt1, int paramInt2) {

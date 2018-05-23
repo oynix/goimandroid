@@ -1,4 +1,4 @@
-package com.mixotc.imsdk;
+package com.mixotc.imsdklib;
 
 import android.content.Context;
 

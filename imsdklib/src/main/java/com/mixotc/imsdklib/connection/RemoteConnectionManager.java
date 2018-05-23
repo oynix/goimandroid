@@ -3,14 +3,18 @@ package com.mixotc.imsdklib.connection;
 import android.content.Context;
 import android.os.RemoteException;
 
+import com.mixotc.imsdklib.RemoteConfig;
 import com.mixotc.imsdklib.error.ErrorType;
+import com.mixotc.imsdklib.exception.GOIMException;
 import com.mixotc.imsdklib.listener.ChannelConnectionListener;
 import com.mixotc.imsdklib.listener.PacketReceivedListener;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
 import com.mixotc.imsdklib.listener.RemoteConnectionListener;
 import com.mixotc.imsdklib.packet.BasePacket;
+import com.mixotc.imsdklib.packet.LogoutPacket;
 import com.mixotc.imsdklib.packet.PacketDecoder;
 import com.mixotc.imsdklib.packet.PacketEncoder;
+import com.mixotc.imsdklib.packet.ReplyPacket;
 import com.mixotc.imsdklib.utils.Logger;
 import com.mixotc.imsdklib.utils.NetUtils;
 
@@ -63,6 +67,7 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
     private boolean mConnected = false;
     private boolean mLogin = false;
     private ReconnectTask mReconnectThread;
+    private HeartbeatTask mHeartBeatThread;
     private List<PacketReceivedListener> mPacketReceivedListeners = new ArrayList<>();
     private List<RemoteConnectionListener> mRemoteConnectionListeners = new ArrayList<>();
     private ExecutorService mListenerExecutor = Executors.newSingleThreadExecutor();
@@ -101,7 +106,7 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
                     .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000);
         }
         try {
-            InetSocketAddress serverAddress = new InetSocketAddress(InetAddress.getByName(ConnectConfig.SERVER_IP), ConnectConfig.SERVER_PORT);
+            InetSocketAddress serverAddress = new InetSocketAddress(InetAddress.getByName(RemoteConfig.SERVER_IP), RemoteConfig.SERVER_PORT);
             ChannelFuture future = mBootstrap.connect(serverAddress);
             future.addListener(mConnectFutureListener);
         } catch (UnknownHostException e) {
@@ -135,11 +140,11 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
             mChannel.disconnect();
             mChannel = null;
         }
-//        if (mHeartBeatThread != null) {
-//            mHeartBeatThread.mShouldStop = true;
-//            mHeartBeatThread.interrupt();
-//            mHeartBeatThread = null;
-//        }
+        if (mHeartBeatThread != null) {
+            mHeartBeatThread.mShouldStop = true;
+            mHeartBeatThread.interrupt();
+            mHeartBeatThread = null;
+        }
         if (mBootstrap != null) {
             mBootstrap = null;
         }
@@ -199,6 +204,19 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
             return;
         }
         mChannel.writeAndFlush(pkt);
+    }
+
+    public long logout() {
+        mLogin = false;
+        if (mHeartBeatThread != null) {
+            mHeartBeatThread.mShouldStop = true;
+            mHeartBeatThread.interrupt();
+            mHeartBeatThread = null;
+        }
+
+        LogoutPacket pkt = new LogoutPacket();
+        mChannel.writeAndFlush(pkt);
+        return pkt.getPacketId();
     }
 
     private void callbackOnError(RemoteCallBack callBack, int code, String reason) {
@@ -297,6 +315,64 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
     @Override
     public void onReceivedPacket(BasePacket packet) {
         mListenerExecutor.submit(new PacketListenerNotification(packet));
+        if (packet.getPacketType() == BasePacket.PacketType.LOGIN_REPLY) {
+            ReplyPacket replyPacket = new ReplyPacket(packet);
+            int ret = replyPacket.getResult();
+            if (ret == 0) {
+                mLogin = true;
+                if (mHeartBeatThread != null) {
+                    mHeartBeatThread.mShouldStop = true;
+                    mHeartBeatThread.interrupt();
+                    mHeartBeatThread = null;
+                }
+                mHeartBeatThread = new HeartbeatTask();
+                mHeartBeatThread.start();
+                Logger.i(TAG, "start heartbeat");
+            }
+        } else if (packet.getPacketType() == BasePacket.PacketType.LOGOUT_REPLY) {
+            Logger.e(TAG, "logout reply disconnect!!!!!!!!");
+            disconnect();
+        }
+    }
+
+    class HeartbeatTask extends Thread {
+        private int defaultHeartBeatTimeOut = 15000;
+        volatile boolean mShouldStop = false;
+
+        @Override
+        public void run() {
+            while (!mShouldStop && !isInterrupted()) {
+                try {
+                    Logger.e(TAG, "enter while, before sleep, 当前线程：" + Thread.currentThread());
+                    Thread.sleep(defaultHeartBeatTimeOut);
+                    Logger.e(TAG, "after sleep");
+                    if (!isInterrupted()) {
+                        Logger.e(TAG, "enter heart beat write");
+                        if (!doChannelCheck()) {
+                            throw new GOIMException(ErrorType.ERROR_EXCEPTION_SERVER_CONNECTION, "");
+                        }
+                        BasePacket packet = new BasePacket();
+                        packet.setPacketType(BasePacket.PacketType.HEARTBEAT);
+                        mChannel.writeAndFlush(packet);
+                        Logger.e(TAG, "enter heart beat write and write finish");
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Logger.e(TAG, "interrupt:" + e.toString());
+                } catch (GOIMException e) {
+                    e.printStackTrace();
+                    Logger.e(TAG, "GOIMException:" + e.toString());
+                    if (mShouldStop) {
+                        Logger.e(TAG, " should stop , disconnect!!!!!!!!");
+                        disconnect();
+                    } else {
+                        Logger.e(TAG, "should not stop, reconnect");
+                        reconnect();
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     private class PacketListenerNotification implements Runnable {

@@ -1,4 +1,4 @@
-package com.mixotc.imsdklib.connection;
+package com.mixotc.imsdklib;
 
 /**
  * Author   : xiaoyu
@@ -6,7 +6,7 @@ package com.mixotc.imsdklib.connection;
  * Version  : v1.0.0
  * Describe : 参数配置
  */
-public class ConnectConfig {
+public class RemoteConfig {
     public static final String HOST_URL = "http://192.168.113.26";
     public static final String AVATAR_DOWNLOAD_URL = HOST_URL + "/image/";
     public static final String AVATAR_UPLOAD_URL = HOST_URL + "/image/";
@@ -22,5 +22,6 @@ public class ConnectConfig {
     public static final int SERVER_PORT = 8000;
 
     public static final String PARAM_OF_THUMB = "?size=thumb";
+    public static final String COUNTRY = "CN";
 
 }

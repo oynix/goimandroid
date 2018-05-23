@@ -22,4 +22,9 @@ public class RemoteBinder extends RemoteServiceBinder.Stub {
     public void sendCode(String phone, String email, RemoteCallBack callBack) throws RemoteException {
         RemoteAccountManager.getInstance().sendLoginCode(phone, email, callBack);
     }
+
+    @Override
+    public void login(String phone, String email, String code, RemoteCallBack callBack) throws RemoteException {
+        RemoteAccountManager.getInstance().login(phone, email, code, 0, callBack);
+    }
 }

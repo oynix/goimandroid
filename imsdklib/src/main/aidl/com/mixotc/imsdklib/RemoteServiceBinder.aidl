@@ -13,4 +13,5 @@ interface RemoteServiceBinder {
             double aDouble, String aString);
 
     void sendCode(String phone, String email, RemoteCallBack callback);
+    void login(String phone, String email, String code, RemoteCallBack callback);
 }

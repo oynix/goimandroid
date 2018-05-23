@@ -52,4 +52,18 @@ public final class AdminManager {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 在登录页面进行手动登录操作
+     */
+    public void login(String phone, String email, String code, RemoteCallBack callBack) {
+        RemoteServiceBinder binder = mBindServiceHelper.getBinder();
+        if (binder == null)
+            return;
+        try {
+            binder.login(phone, email, code, callBack);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
 }

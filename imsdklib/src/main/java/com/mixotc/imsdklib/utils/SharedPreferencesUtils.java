@@ -2,6 +2,13 @@ package com.mixotc.imsdklib.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Parcel;
+import android.text.TextUtils;
+import android.util.Base64;
+
+import com.mixotc.imsdklib.chat.GOIMContact;
+
+import static com.mixotc.imsdklib.utils.SharedPreferencesIds.KEY_LAST_LOGIN_USER;
 
 /**
  * Author   : xiaoyu
@@ -36,9 +43,56 @@ public final class SharedPreferencesUtils {
         edit.putString(id, str).apply();
     }
 
+    public String getString(String id, String value) {
+        return mSharedPreferences.getString(id, value);
+    }
+
     public void putLong(String id, long value) {
         SharedPreferences.Editor edit = mSharedPreferences.edit();
         edit.putLong(id, value).apply();
+    }
+
+    public long getLong(String key, long value) {
+        return mSharedPreferences.getLong(key, value);
+    }
+
+    public GOIMContact getLastLoginUser() {
+        GOIMContact lastLoginUser = null;
+        String hash = mSharedPreferences.getString(KEY_LAST_LOGIN_USER, "");
+        if (!TextUtils.isEmpty(hash)) {
+            byte[] bytes = Base64.decode(hash.getBytes(), Base64.DEFAULT);
+            Parcel parcel = Parcel.obtain();
+            parcel.unmarshall(bytes, 0, bytes.length);
+            parcel.setDataPosition(0);
+            lastLoginUser = parcel.readParcelable(GOIMContact.class.getClassLoader());
+            parcel.recycle();
+        }
+        return lastLoginUser;
+    }
+
+    public void setLastLoginUser(GOIMContact user) {
+        if (user == null) {
+            return;
+        }
+        Parcel parcel = Parcel.obtain();
+        parcel.writeParcelable(user, 0);
+        byte[] bytes = parcel.marshall();
+        String hash = Base64.encodeToString(bytes, Base64.DEFAULT);
+        SharedPreferences.Editor edit = mSharedPreferences.edit();
+        edit.putString(KEY_LAST_LOGIN_USER, hash);
+        edit.apply();
+        parcel.recycle();
+    }
+
+    public boolean updateTime(String key, long time) {
+        long lastUpdateTime = mSharedPreferences.getLong(key, -1);
+        if (time > lastUpdateTime) {
+            SharedPreferences.Editor edit = mSharedPreferences.edit();
+            edit.putLong(key, time);
+            edit.apply();
+            return true;
+        }
+        return false;
     }
 
 }

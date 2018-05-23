@@ -14,9 +14,7 @@ public class ReplyPacket extends BasePacket {
 
     public ReplyPacket(BasePacket msg) {
         super(msg.getVersion(), msg.getPacketType(), msg.getPacketId(), msg.getPacketBody());
-
         mResult = -1;
-
         try {
             mData = new JSONObject(new String(this.mPacketBody));
             mResult = mData.optInt("ret", 0);

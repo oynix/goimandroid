@@ -2,6 +2,8 @@ package com.mixotc.goimandroid;
 
 import android.app.Application;
 
+import com.mixotc.imsdklib.AdminManager;
+
 /**
  * Author   : xiaoyu
  * Date     : 2018/5/23 上午11:05
@@ -9,4 +11,10 @@ import android.app.Application;
  * Describe :
  */
 public class TheApplication extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        AdminManager.getInstance().initOnAppCreate(this, LocalService.class);
+    }
 }

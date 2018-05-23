@@ -2,6 +2,8 @@ package com.mixotc.imsdklib;
 
 import android.content.Context;
 
+import com.mixotc.imsdklib.service.AgentService;
+
 /**
  * Author   : xiaoyu
  * Date     : 2018/5/23 上午11:09
@@ -25,6 +27,9 @@ public final class AdminManager {
         return LazyHolder.INSTANCE;
     }
 
+    /**
+     * 主进程application创建时进行初始化，启动远程服务service
+     */
     public void initOnAppCreate(Context context, Class<? extends AgentService> service) {
         mBindServiceHelper = new BindServiceHelper(context, service);
         mBindServiceHelper.bind();

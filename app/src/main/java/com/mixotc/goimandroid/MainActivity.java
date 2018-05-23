@@ -1,9 +1,7 @@
 package com.mixotc.goimandroid;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
-import com.mixotc.imsdklib.connection.RemoteConnectionManager;
+import android.support.v7.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -11,7 +9,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        RemoteConnectionManager.getInstance().init(this);
-        RemoteConnectionManager.getInstance().connect();
+
     }
 }

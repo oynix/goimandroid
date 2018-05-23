@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
+import com.mixotc.imsdklib.service.AgentService;
+
 import static android.content.Context.BIND_AUTO_CREATE;
 
 /**

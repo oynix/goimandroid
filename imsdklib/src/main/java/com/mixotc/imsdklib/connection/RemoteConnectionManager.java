@@ -119,7 +119,7 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
     /**
      * 主动断开和服务器的socket连接
      */
-    private void disconnect() {
+    public void disconnect() {
         Logger.d(TAG, "disconnect invoked!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         if (mChannel != null) {
             mChannel.disconnect();

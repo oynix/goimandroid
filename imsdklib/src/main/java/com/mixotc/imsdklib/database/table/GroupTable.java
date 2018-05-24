@@ -1,6 +1,13 @@
 package com.mixotc.imsdklib.database.table;
 
+import android.content.ContentValues;
 import android.provider.BaseColumns;
+
+import com.mixotc.imsdklib.chat.GOIMContact;
+import com.mixotc.imsdklib.chat.GOIMGroup;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Author   : xiaoyu
@@ -67,27 +74,27 @@ public class GroupTable implements BaseColumns {
                 " INTEGER);";
     }
 
-//    public static ContentValues createContentValues(GOIMGroup group) {
-//        StringBuilder memberStr = new StringBuilder();
-//        Collection<GOIMContact> members = group.getMembers();
-//        Iterator iterator = members.iterator();
-//        while (iterator.hasNext()) {
-//            GOIMContact contact = (GOIMContact) iterator.next();
-//            memberStr.append(contact.getUid());
-//            if (iterator.hasNext()) {
-//                memberStr.append("|");
-//            }
-//        }
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(GROUP_ID, group.getGroupId());
-//        contentValues.put(GROUP_NAME, group.getGroupName());
-//        contentValues.put(DESC, group.getDescription());
-//        contentValues.put(OWNER, group.getOwner());
-//        contentValues.put(MEMBERS, memberStr.toString());
-//        contentValues.put(MODIFY_TIME, group.getLastModifiedTime());
-//        contentValues.put(IS_BLOCK, group.isMsgBlocked());
-//        contentValues.put(MAX_USERS, group.getMaxUsers());
-//        contentValues.put(IS_SINGLE, group.isSingle());
-//        return contentValues;
-//    }
+    public static ContentValues createContentValues(GOIMGroup group) {
+        StringBuilder memberStr = new StringBuilder();
+        Collection<GOIMContact> members = group.getMembers();
+        Iterator iterator = members.iterator();
+        while (iterator.hasNext()) {
+            GOIMContact contact = (GOIMContact) iterator.next();
+            memberStr.append(contact.getUid());
+            if (iterator.hasNext()) {
+                memberStr.append("|");
+            }
+        }
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(GROUP_ID, group.getGroupId());
+        contentValues.put(GROUP_NAME, group.getGroupName());
+        contentValues.put(DESC, group.getDescription());
+        contentValues.put(OWNER, group.getOwner());
+        contentValues.put(MEMBERS, memberStr.toString());
+        contentValues.put(MODIFY_TIME, group.getLastModifiedTime());
+        contentValues.put(IS_BLOCK, group.isMsgBlocked());
+        contentValues.put(MAX_USERS, group.getMaxUsers());
+        contentValues.put(IS_SINGLE, group.isSingle());
+        return contentValues;
+    }
 }

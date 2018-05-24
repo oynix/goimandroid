@@ -5,7 +5,7 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 
 import com.mixotc.imsdklib.RemoteConfig;
-import com.mixotc.imsdklib.error.ErrorType;
+import com.mixotc.imsdklib.exception.ErrorType;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
 import com.mixotc.imsdklib.utils.FileUtils;
 import com.mixotc.imsdklib.utils.Logger;

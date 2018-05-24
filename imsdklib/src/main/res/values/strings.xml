@@ -1,3 +1,60 @@
 <resources>
     <string name="app_name">imsdklib</string>
+    <string name="group_manager_group_member_separator">、</string>
+    <string name="group_manager_group_member_format_string">\"%1$s\"</string>
+    <string name="group_manager_my_group_created_format_string">您邀请%1$s加入了群聊</string>
+    <string name="group_manager_group_created_format_string">\"%1$s\"邀请您和%2$s加入了群聊</string>
+    <string name="group_manager_unknown_group_created_format_string">管理员邀请您和%1$s加入了群聊</string>
+    <string name="contact_manager_added_friend_format_string">您已将%1$s添加到好友列表</string>
+    <string name="contact_manager_accept_friend_request">已同意您的好友请求</string>
+    <string name="group_manager_group_new_member_format_string">\"%1$s\"邀请%2$s加入了群聊</string>
+    <string name="group_manager_group_added_you_format_string">\"%1$s\"邀请您加入了群聊</string>
+    <string name="group_manager_kicked_from_group">管理员已将您从群聊中移除</string>
+    <string name="group_manager_kicked_other_from_group">管理员已将\"%1$s\"从群聊中移除</string>
+    <string name="group_manager_group_dissolved">管理员已将群聊解散</string>
+    <string name="group_manager_group_change_group_name">\"%1$s\"已将群名称修改为\"%2$s\"</string>
+    <string name="group_manager_group_member_quit">\"%1$s\"已退出群聊</string>
+
+    <string name="contact_manager_removed_you_from_friends">已将您从好友中移除</string>
+    <string name="contact_manager_request_add_friend">请求添加您为好友</string>
+
+    <string name="notification_new_file">发来一个文件</string>
+    <string name="notification_new_notify">收到一条通知</string>
+    <string name="notification_new_text">发来一条消息</string>
+    <string name="notification_new_location">发来位置信息</string>
+    <string name="notification_new_image">发来一张图片</string>
+    <string name="notification_new_video">发来一个视频</string>
+    <string name="notification_new_voice">发来一段语音</string>
+    <string name="notification_new_packet">发来一个红包</string>
+    <string name="notification_new_transfer">发起了转账</string>
+    <string name="notification_new_securetrans">发起了担保转账</string>
+    <string name="notification_new_message_format_string">%1$d条新消息</string>
+    <string name="notification_new_notify_format_string">%1$d条新通知</string>
+    <string name="notification_and_string">，</string>
+
+
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="next">下一步</string>
+    <string name="location_recv">[%1$s的位置]</string>
+    <string name="recording_video">录制视频</string>
+    <string name="location_prefix">[我的位置]</string>
+    <string name="picture">[图片]</string>
+    <string name="video">[视频]</string>
+    <string name="file">[文件]</string>
+    <string name="packet">[红包]</string>
+    <string name="transfer">[转账]</string>
+    <string name="securedtransfer">[担保转账]</string>
+    <string name="search_header">搜</string>
+    <string name="recoding_fail">录音失败，请重试！</string>
+    <string name="voice">[语音]</string>
+    <string name="search">搜索</string>
+    <string name="not_add_myself">不能添加自己</string>
+    <string name="already_friends_format_string">%1$s已经是您的朋友了。</string>
+    <string name="Network_error">网络出错</string>
+    <string name="is_sending_a_request">正在发送请求…</string>
+    <string name="less_than_chat_server_connection">连接不到聊天服务器</string>
+    <string name="the_current_network">当前网络不可用，请检查网络设置</string>
+    <string name="no_name">未知</string>
+
 </resources>

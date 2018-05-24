@@ -18,6 +18,7 @@ public final class AdminManager {
 
     private static final String TAG = AdminManager.class.getSimpleName();
 
+    private Context mContext;
     private BindServiceHelper mBindServiceHelper;
 
     private static class LazyHolder {
@@ -35,8 +36,20 @@ public final class AdminManager {
      * 主进程application创建时进行初始化，启动远程服务service
      */
     public void initOnAppCreate(Context context, Class<? extends RemoteService> service) {
+        mContext = context.getApplicationContext();
         mBindServiceHelper = new BindServiceHelper(context, service);
         mBindServiceHelper.bind();
+    }
+
+    public Context getApplicationContext() {
+        return mContext;
+    }
+
+    public RemoteServiceBinder getBinder() {
+        if (mBindServiceHelper != null) {
+            return mBindServiceHelper.getBinder();
+        }
+        return null;
     }
 
     /**

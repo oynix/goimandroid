@@ -1,6 +1,9 @@
 package com.mixotc.imsdklib.database.table;
 
+import android.content.ContentValues;
 import android.provider.BaseColumns;
+
+import com.mixotc.imsdklib.chat.GOIMFriendRequest;
 
 /**
  * Author   : xiaoyu
@@ -45,14 +48,14 @@ public class FriendRequestTable implements BaseColumns {
                 " INTEGER);";
     }
 
-//    public static ContentValues createContentValues(GOIMFriendRequest request) {
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(USER_ID, request.getUid());
-//        contentValues.put(USER_NAME, request.getUsername());
-//        contentValues.put(AVATAR, request.getAvatar());
-//        contentValues.put(INFO, request.getRequestInfo());
-//        contentValues.put(REQ_TIME, request.getRequestTime());
-//        contentValues.put(RESPONSE, request.getResponse().ordinal());
-//        return contentValues;
-//    }
+    public static ContentValues createContentValues(GOIMFriendRequest request) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(USER_ID, request.getUid());
+        contentValues.put(USER_NAME, request.getUsername());
+        contentValues.put(AVATAR, request.getAvatar());
+        contentValues.put(INFO, request.getRequestInfo());
+        contentValues.put(REQ_TIME, request.getRequestTime());
+        contentValues.put(RESPONSE, request.getResponse().ordinal());
+        return contentValues;
+    }
 }

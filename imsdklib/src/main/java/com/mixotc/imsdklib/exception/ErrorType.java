@@ -1,4 +1,4 @@
-package com.mixotc.imsdklib.error;
+package com.mixotc.imsdklib.exception;
 
 public interface ErrorType {
     int ERROR_EXCEPTION_NO_ERROR = 0;

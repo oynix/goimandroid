@@ -8,13 +8,13 @@ import com.mixotc.imsdklib.account.RemoteAccountManager;
 import java.io.File;
 
 public class PathUtil {
-    public static String pathPrefix;
-    public static final String imagePathName = "/images/";
-    public static final String voicePathName = "/voices/";
-    public static final String filePathName = "/files/";
-    public static final String videoPathName = "/videos/";
-    public static final String thumbPathName = "/thumbs/";
-    public static final String tempPathName = "/temp/";
+    private static String pathPrefix;
+    private static final String imagePathName = "/images/";
+    private static final String voicePathName = "/voices/";
+    private static final String filePathName = "/files/";
+    private static final String videoPathName = "/videos/";
+    private static final String thumbPathName = "/thumbs/";
+    private static final String tempPathName = "/temp/";
     private static File storageDir = null;
     private static PathUtil instance = null;
     private File voicePath = null;
@@ -36,6 +36,7 @@ public class PathUtil {
 
     public void initDirs(long uid, Context context) {
         String str = context.getPackageName();
+        // TODO: 2018/5/24 路径获取方式待修改
         pathPrefix = "/Android/data/" + str + "/";
         voicePath = generateVoicePath(uid, context);
         if (!voicePath.exists()) {

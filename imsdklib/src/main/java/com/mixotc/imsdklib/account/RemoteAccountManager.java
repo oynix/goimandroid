@@ -9,7 +9,7 @@ import com.mixotc.imsdklib.BuildConfig;
 import com.mixotc.imsdklib.RemoteConfig;
 import com.mixotc.imsdklib.chat.GOIMContact;
 import com.mixotc.imsdklib.connection.RemoteConnectionManager;
-import com.mixotc.imsdklib.error.ErrorType;
+import com.mixotc.imsdklib.exception.ErrorType;
 import com.mixotc.imsdklib.listener.PacketReceivedListener;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
 import com.mixotc.imsdklib.listener.RemoteConnectionListener;

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.RemoteException;
 
 import com.mixotc.imsdklib.RemoteConfig;
-import com.mixotc.imsdklib.error.ErrorType;
+import com.mixotc.imsdklib.exception.ErrorType;
 import com.mixotc.imsdklib.exception.GOIMException;
 import com.mixotc.imsdklib.listener.ChannelConnectionListener;
 import com.mixotc.imsdklib.listener.PacketReceivedListener;
@@ -206,6 +206,11 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
         mChannel.writeAndFlush(pkt);
     }
 
+    /**
+     * 主动登出，向服务器发送logout packet
+     * todo 有待修改，统一使用{@link #writeAndFlushPacket(BasePacket, RemoteCallBack)}发送packet
+     * @return
+     */
     public long logout() {
         mLogin = false;
         if (mHeartBeatThread != null) {

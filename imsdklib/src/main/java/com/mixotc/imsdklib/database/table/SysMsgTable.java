@@ -1,6 +1,9 @@
 package com.mixotc.imsdklib.database.table;
 
+import android.content.ContentValues;
 import android.provider.BaseColumns;
+
+import com.mixotc.imsdklib.message.GOIMSystemMessage;
 
 /**
  * Author   : xiaoyu
@@ -43,14 +46,14 @@ public class SysMsgTable implements BaseColumns {
                 " INTEGER);";
     }
 
-//    public static ContentValues createContentValues(GOIMSystemMessage systemMessage) {
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(MSG_TIME, systemMessage.getMsgTime());
-//        contentValues.put(MSG_TEXT, systemMessage.getMsgText());
-//        contentValues.put(MSG_ATTR, systemMessage.getMsgAttributes().toString());
-//        contentValues.put(MSG_TYPE, systemMessage.getMsgType().ordinal());
-//        contentValues.put(UNREAD, systemMessage.unRead() ? 1 : 0);
-//        return contentValues;
-//    }
+    public static ContentValues createContentValues(GOIMSystemMessage systemMessage) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MSG_TIME, systemMessage.getMsgTime());
+        contentValues.put(MSG_TEXT, systemMessage.getMsgText());
+        contentValues.put(MSG_ATTR, systemMessage.getMsgAttributes().toString());
+        contentValues.put(MSG_TYPE, systemMessage.getMsgType().ordinal());
+        contentValues.put(UNREAD, systemMessage.unRead() ? 1 : 0);
+        return contentValues;
+    }
 
 }

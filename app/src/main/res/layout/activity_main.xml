@@ -5,23 +5,57 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    android:paddingLeft="15dp"
+    android:gravity="center"
+    android:paddingRight="15dp"
+    tools:context=".LoginActivity">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Request Code!"
-        android:onClick="requestCode"/>
-
-    <EditText
-        android:id="@+id/et_login_code"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:text="Login"
-        android:onClick="login"
-        android:layout_height="wrap_content"/>
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:text="账号："/>
+
+        <EditText
+            android:id="@+id/et_accout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:text="验证码："/>
+
+
+        <EditText
+            android:id="@+id/et_login_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:gravity="center_horizontal"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Request Code!"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Login"/>
+    </LinearLayout>
 
 </LinearLayout>

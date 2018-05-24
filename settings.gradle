@@ -1,1 +1,1 @@
-include ':app', ':imsdklib'
+include ':app', ':mixim'

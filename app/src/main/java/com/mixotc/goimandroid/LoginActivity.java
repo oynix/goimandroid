@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.mixotc.imsdklib.AdminManager;
-import com.mixotc.imsdklib.listener.RemoteCallBack;
+import com.mixotc.imsdklib.listener.CallbackWrapper;
 import com.mixotc.imsdklib.utils.Logger;
 
 import java.util.List;
@@ -37,19 +37,17 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 // use email to login
                 String account = etAccount.getText().toString();
-                AdminManager.getInstance().sendLoginCode("", account, new RemoteCallBack.Stub() {
+                AdminManager.getInstance().sendLoginCode("", account, new CallbackWrapper() {
+
                     @Override
-                    public void onSuccess(List result) {
-                        Logger.d(TAG, "send code successfully!!!!");
+                    public void onMainThreadSuccess(List result) {
+                        Logger.d(TAG, "send code successfully!!!!" + Thread.currentThread());
+
                     }
 
                     @Override
-                    public void onError(int errorCode, String reason) {
+                    public void onMainThreadError(int errorCode, String reason) {
                         Logger.d(TAG, "send code failed!!!!" + errorCode);
-                    }
-
-                    @Override
-                    public void onProgress(int progress, String message) {
 
                     }
                 });
@@ -69,25 +67,18 @@ public class LoginActivity extends AppCompatActivity {
                     Logger.d(TAG, "输入有误，请检查!!!");
                     return;
                 }
-                AdminManager.getInstance().login("", account, code, new RemoteCallBack.Stub() {
+                AdminManager.getInstance().login("", account, code, new CallbackWrapper() {
+
                     @Override
-                    public void onSuccess(List result) {
-                        Logger.d(TAG, "======login成功");
-                        TheApplication.postOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                               loginComp();
-                            }
-                        });
+                    public void onMainThreadSuccess(List result) {
+                        Logger.d(TAG, "======login成功" + Thread.currentThread());
+                        loginComp();
+
                     }
 
                     @Override
-                    public void onError(int errorCode, String reason) {
+                    public void onMainThreadError(int errorCode, String reason) {
                         Logger.d(TAG, "======login失败" + errorCode);
-                    }
-
-                    @Override
-                    public void onProgress(int progress, String message) {
 
                     }
                 });

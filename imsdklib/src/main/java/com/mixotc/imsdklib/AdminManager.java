@@ -3,8 +3,12 @@ package com.mixotc.imsdklib;
 import android.content.Context;
 import android.os.RemoteException;
 
+import com.mixotc.imsdklib.chat.GOIMContact;
+import com.mixotc.imsdklib.chat.GOIMContactManager;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
 import com.mixotc.imsdklib.service.RemoteService;
+
+import java.util.Map;
 
 /**
  * Author   : xiaoyu
@@ -78,5 +82,12 @@ public final class AdminManager {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 获取所有联系人
+     */
+    public Map<Long, GOIMContact> getContacts() {
+        return GOIMContactManager.getInstance().getContactList();
     }
 }

@@ -22,7 +22,7 @@
         </activity>
 
         <activity android:name=".MainActivity"/>
-        <activity android:name=".ContactActivity"/>
+        <activity android:name=".contact.ContactActivity"/>
 
         <service android:name=".LocalService"
                  android:enabled="true"

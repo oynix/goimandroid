@@ -190,8 +190,9 @@ public class RemoteAccountManager {
                 // 完成后再按需请求groups from server，同步服务器端数据库
                 Logger.d(TAG, "before onLoggedIn()");
                 // 通知Local登录成功,Local自动初始化数据到内存
-                callbackOnSuccess(callBack, null);
                 onLoggedIn();
+                // 数据初始化完毕，回调Local更新UI
+                callbackOnSuccess(callBack, null);
                 Logger.d(TAG, "after onLoggedIn()");
                 final long lastMid = SharedPreferencesUtils.getInstance(mContext).getLong(KEY_LAST_MSG_ID, -1);
 //                final long lastMid = 0;

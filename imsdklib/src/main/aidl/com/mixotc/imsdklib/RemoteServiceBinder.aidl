@@ -26,7 +26,7 @@ interface RemoteServiceBinder {
      void addContactListener(RemoteContactListener listener);
      void addGroupListener(RemoteGroupListener listener);
      void addConversationListener(RemoteConversationListener listener);
-     void remoteAllRemoteListeners();
+     void removeAllRemoteListeners();
 
     // account
     void sendCode(String phone, String email, RemoteCallBack callback);

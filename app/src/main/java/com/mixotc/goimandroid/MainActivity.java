@@ -1,9 +1,12 @@
 package com.mixotc.goimandroid;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+
+import com.mixotc.goimandroid.contact.ContactActivity;
 
 /**
  * Author   : xiaoyu
@@ -22,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         btnContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                startActivity(new Intent(MainActivity.this, ContactActivity.class));
             }
         });
     }

@@ -54,6 +54,7 @@ public final class RemoteInitializer {
         RemoteGroupManager.getInstance().init(context);
         RemoteConversationManager.getInstance().init(context);
 
+        Logger.d(TAG, "======尝试登录------");
         if (RemoteAccountManager.getInstance().isLoginPermit(context)) {
             String phone = SharedPreferencesUtils.getInstance(context).getString(KEY_LAST_PHONE, "");
             String email = SharedPreferencesUtils.getInstance(context).getString(KEY_LAST_EMAIL, "");

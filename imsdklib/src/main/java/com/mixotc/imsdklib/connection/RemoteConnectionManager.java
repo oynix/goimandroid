@@ -1,6 +1,7 @@
 package com.mixotc.imsdklib.connection;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.RemoteException;
 
 import com.mixotc.imsdklib.RemoteConfig;
@@ -14,9 +15,12 @@ import com.mixotc.imsdklib.packet.BasePacket;
 import com.mixotc.imsdklib.packet.PacketDecoder;
 import com.mixotc.imsdklib.packet.PacketEncoder;
 import com.mixotc.imsdklib.packet.ReplyPacket;
+import com.mixotc.imsdklib.remotechat.RemoteAccountManager;
+import com.mixotc.imsdklib.remotechat.RemoteChatManager;
 import com.mixotc.imsdklib.remotechat.RemoteDBManager;
 import com.mixotc.imsdklib.utils.Logger;
 import com.mixotc.imsdklib.utils.NetUtils;
+import com.mixotc.imsdklib.utils.SharedPreferencesUtils;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -37,6 +41,10 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+
+import static com.mixotc.imsdklib.utils.SharedPreferencesIds.KEY_LAST_EMAIL;
+import static com.mixotc.imsdklib.utils.SharedPreferencesIds.KEY_LAST_LOGIN_CODE;
+import static com.mixotc.imsdklib.utils.SharedPreferencesIds.KEY_LAST_PHONE;
 
 /**
  * Author   : xiaoyu
@@ -417,51 +425,51 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
     }
 
     private void autoLogin() {
-//        if (RemoteServiceInitializer.getInstance().isLoginPermit()) {
-//            String phone = PreferenceUtils.getInstance(mContext).getLastLoginPhoneNumber();
-//            String email = PreferenceUtils.getInstance(mContext).getLastLoginEmail();
-//            String code = PreferenceUtils.getInstance(mContext).getLastLoginCode();
-//            Logger.e(TAG, "auto login");
-//            RemoteAccountManager.getInstance().login(phone, email, code, RemoteAccountManager.LOGIN_MODE_RECONNECT,
-//                    new RemoteCallBack.Stub() {
-//
-//                        @Override
-//                        public void onSuccess(List result) {
-//                            Logger.d("RemoteConnectionManager", "自动登录成功，自动重连结束。");
-//                            if (mReconnectThread != null) {
-//                                mReconnectThread.mShouldStop = true;
-//                                mReconnectThread.interrupt();
-//                                mReconnectThread = null;
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onError(int errorCode, String reason) {
-//                            if (errorCode == ERROR_EXCEPTION_CODEINVALID || errorCode == ERROR_EXCEPTION_CODEERROR
-//                                    || errorCode == ERROR_EXCEPTION_OTHERLOGIN) {
-//                                Logger.d("RemoteConnectionManager", "自动登录失败，终止。");
-//                                if (mReconnectThread != null) {
-//                                    mReconnectThread.mShouldStop = true;
-//                                    mReconnectThread.interrupt();
-//                                    mReconnectThread = null;
-//                                }
-//
-//                                RemoteChatManager.getInstance().onLoggedOut(false);
-//                                RemoteAccountManager.getInstance().onLoggedOut();
-//
-//                                Intent intent = new Intent(RemoteChatManager.getInstance().getLogoutBroadcastAction());
-//                                mContext.sendOrderedBroadcast(intent, null);
-//                            } else {
-//                                Logger.d("RemoteConnectionManager", "自动登录失败，继续。");
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onProgress(int progress, String message) {
-//
-//                        }
-//                    });
-//        }
+        if (RemoteAccountManager.getInstance().isLoginPermit(mContext)) {
+            String phone = SharedPreferencesUtils.getInstance(mContext).getString(KEY_LAST_PHONE, "");
+            String email = SharedPreferencesUtils.getInstance(mContext).getString(KEY_LAST_EMAIL, "");
+            String code = SharedPreferencesUtils.getInstance(mContext).getString(KEY_LAST_LOGIN_CODE, "");
+            Logger.e(TAG, "auto login");
+            RemoteAccountManager.getInstance().login(phone, email, code, RemoteAccountManager.LOGIN_MODE_RECONNECT,
+                    new RemoteCallBack.Stub() {
+
+                        @Override
+                        public void onSuccess(List result) {
+                            Logger.d("RemoteConnectionManager", "自动登录成功，自动重连结束。");
+                            if (mReconnectThread != null) {
+                                mReconnectThread.mShouldStop = true;
+                                mReconnectThread.interrupt();
+                                mReconnectThread = null;
+                            }
+                        }
+
+                        @Override
+                        public void onError(int errorCode, String reason) {
+                            if (errorCode == ErrorType.ERROR_EXCEPTION_CODEINVALID || errorCode == ErrorType.ERROR_EXCEPTION_CODEERROR
+                                    || errorCode == ErrorType.ERROR_EXCEPTION_OTHERLOGIN) {
+                                Logger.d("RemoteConnectionManager", "自动登录失败，终止。");
+                                if (mReconnectThread != null) {
+                                    mReconnectThread.mShouldStop = true;
+                                    mReconnectThread.interrupt();
+                                    mReconnectThread = null;
+                                }
+
+                                RemoteChatManager.getInstance().onLoggedOut(false);
+                                RemoteAccountManager.getInstance().onLoggedOut();
+
+                                Intent intent = new Intent(RemoteChatManager.getInstance().getLogoutBroadcastAction());
+                                mContext.sendOrderedBroadcast(intent, null);
+                            } else {
+                                Logger.d("RemoteConnectionManager", "自动登录失败，继续。");
+                            }
+                        }
+
+                        @Override
+                        public void onProgress(int progress, String message) {
+
+                        }
+                    });
+        }
     }
 
 }

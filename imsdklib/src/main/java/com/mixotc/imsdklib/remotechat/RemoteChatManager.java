@@ -41,9 +41,9 @@ import static com.mixotc.imsdklib.utils.SharedPreferencesIds.KEY_UPDATE_GROUP_TI
 
 public class RemoteChatManager {
     private static final String TAG = RemoteChatManager.class.getSimpleName();
-    private static final String NEW_MSG_BROADCAST = "mixotc.newmsg.";
-    private static final String LOGOUT_BROADCAST = "mixotc.logout.";
-    private static final String NEW_SYSTEM_MSG_BROADCAST = "mixotc.newsystemmsg.";
+    private static final String NEW_MSG_BROADCAST = "imsdk.mixotc.newmsg.";
+    private static final String LOGOUT_BROADCAST = "imsdk.mixotc.logout.";
+    private static final String NEW_SYSTEM_MSG_BROADCAST = "imsdk.mixotc.newsystemmsg.";
 
     private static RemoteChatManager sInstance = new RemoteChatManager();
     private Context mContext;

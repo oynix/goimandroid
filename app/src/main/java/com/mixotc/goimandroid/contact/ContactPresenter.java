@@ -15,7 +15,7 @@ public class ContactPresenter implements ContactContract.Presenter {
     private ContactContract.View mView;
     private ContactContract.Model mModel;
 
-    public ContactPresenter(ContactContract.View view, ContactContract.Model model) {
+    ContactPresenter(ContactContract.View view, ContactContract.Model model) {
         mView = view;
         mModel = model;
     }

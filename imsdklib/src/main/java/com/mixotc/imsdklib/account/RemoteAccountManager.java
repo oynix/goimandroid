@@ -33,6 +33,7 @@ import static com.mixotc.imsdklib.utils.SharedPreferencesIds.KEY_LAST_EMAIL;
 import static com.mixotc.imsdklib.utils.SharedPreferencesIds.KEY_LAST_LOGIN_CODE;
 import static com.mixotc.imsdklib.utils.SharedPreferencesIds.KEY_LAST_MSG_ID;
 import static com.mixotc.imsdklib.utils.SharedPreferencesIds.KEY_LAST_PHONE;
+import static com.mixotc.imsdklib.utils.SharedPreferencesIds.KEY_LOGIN_CODE_VALID_TIME;
 import static com.mixotc.imsdklib.utils.SharedPreferencesIds.KEY_UPDATE_FRIEND_TIME;
 import static com.mixotc.imsdklib.utils.SharedPreferencesIds.KEY_UPDATE_GROUP_TIME;
 
@@ -325,8 +326,20 @@ public class RemoteAccountManager {
         }).start();
     }
 
+    /** 获取当前登录的user */
     public GOIMContact getLoginUser() {
         return SharedPreferencesUtils.getInstance(mContext).getLastLoginUser();
+    }
+
+    /** 是否允许登录:phone或email不为空，并且code未过期 */
+    public boolean isLoginPermit(Context context) {
+        String phone = SharedPreferencesUtils.getInstance(context).getString(KEY_LAST_PHONE, "");
+        String email = SharedPreferencesUtils.getInstance(context).getString(KEY_LAST_EMAIL, "");
+        String code = SharedPreferencesUtils.getInstance(context).getString(KEY_LAST_LOGIN_CODE, "");
+        long validTime = SharedPreferencesUtils.getInstance(context).getLong(KEY_LOGIN_CODE_VALID_TIME, 0);
+
+        return (!TextUtils.isEmpty(phone) || !TextUtils.isEmpty(email))
+                && (!TextUtils.isEmpty(code) && validTime > System.currentTimeMillis());
     }
 
     private void callbackOnSuccess(RemoteCallBack callBack, List result) {
@@ -349,6 +362,7 @@ public class RemoteAccountManager {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     private void onLoggedIn() {
         for (RemoteLoggedStatusListener listener : mLoggedListeners) {
             try {

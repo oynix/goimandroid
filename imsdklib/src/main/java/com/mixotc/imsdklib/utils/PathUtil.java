@@ -3,7 +3,7 @@ package com.mixotc.imsdklib.utils;
 import android.content.Context;
 import android.os.Environment;
 
-import com.mixotc.imsdklib.account.RemoteAccountManager;
+import com.mixotc.imsdklib.remotechat.RemoteAccountManager;
 
 import java.io.File;
 

@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.mixotc.imsdklib.AdminManager;
 import com.mixotc.imsdklib.RemoteServiceBinder;
-import com.mixotc.imsdklib.account.RemoteAccountManager;
+import com.mixotc.imsdklib.remotechat.RemoteAccountManager;
 import com.mixotc.imsdklib.exception.ErrorType;
 import com.mixotc.imsdklib.listener.GOIMContactListener;
 import com.mixotc.imsdklib.listener.RemoteCallBack;

@@ -1,4 +1,4 @@
-package com.mixotc.imsdklib.account;
+package com.mixotc.imsdklib.remotechat;
 
 import android.content.Context;
 import android.os.Build;
@@ -16,6 +16,7 @@ import com.mixotc.imsdklib.listener.RemoteConnectionListener;
 import com.mixotc.imsdklib.listener.RemoteLoggedStatusListener;
 import com.mixotc.imsdklib.packet.BasePacket;
 import com.mixotc.imsdklib.packet.LoginPacket;
+import com.mixotc.imsdklib.packet.LogoutPacket;
 import com.mixotc.imsdklib.packet.ReplyPacket;
 import com.mixotc.imsdklib.packet.SendCodePacket;
 import com.mixotc.imsdklib.utils.DeviceUtil;
@@ -92,7 +93,7 @@ public class RemoteAccountManager {
                     JSONObject data = replyPacket.getData();
                     long validTime = data.optLong("valid_time", -1);
                     if (ret == 0 || ret == ErrorType.ERROR_EXCEPTION_CODESENT) {
-                        SharedPreferencesUtils.getInstance(mContext).putLong(SharedPreferencesIds.KEY_LOGIN_CODE_VALID_TIME, validTime);
+                        SharedPreferencesUtils.getInstance(mContext).putLong(SharedPreferencesIds.KEY_LOGIN_CODE_VALID_TIME, System.currentTimeMillis() + validTime * 1000);
                         callbackOnSuccess(callBack, null);
                     } else {
                         callbackOnError(callBack, ret, reason);
@@ -177,26 +178,10 @@ public class RemoteAccountManager {
                 SharedPreferencesUtils.getInstance(mContext).putString(KEY_LAST_LOGIN_CODE, code);
                 SharedPreferencesUtils.getInstance(mContext).setLastLoginUser(lastLoginUser);
 
-//                boolean dbExist = RemoteDBManager.initDB(mContext, lastLoginUser.getUid());
-                boolean dbExist = false;
+                boolean dbExist = RemoteDBManager.initDB(mContext, lastLoginUser.getUid());
                 PathUtil.getInstance().initDirs(RemoteAccountManager.getInstance().getLoginUser().getUid(), mContext);
 
-//                RemoteChatManager.getInstance().onLoggedIn();
-
-                // 更改记录：
-                // 2018／3／22
-                // 这两个值只能表明数据是否更新，无法判定被删除好友和群组人员数量的变化
-                // 所以暂定每次登录都要重新请求数据
-                // 2018/04/19
-                // 服务器数据库表中的update_time的值为row数据最后更新的时间，前提是该row存在，若被删除则无法获取。
-                // 被好友删除或者被群组踢出以及群组解散的情况，也就是contact／group减少的情况，对应的通知会当作离线消息存储，
-                // 当再次登陆请求离线消息时，也可以及时处理，所以不用每次登录都重新请求group数据
-
-                // 需要复现离线消息发生的过程，同步数据改变和解析消息的过程
-                // 如果数据库存在，则先请求离线消息，后进行是否请求更新group的判断，若需要则请求。
-                // 如果数据库不存在，则先直接请求group，之后再请求离线消息
-                // 如果离线期间被别人删除好友，目前会发生删除动作前的离线消息服务器不推送
-
+                RemoteChatManager.getInstance().onLoggedIn();
                 // 2018/4/26
                 // 新策略按两种情况处理：
                 // 1。登录成功后本地没有该用户的IM数据库，即新账号登录：先初始化Local，再请求groups from server，完成后进入app，同时请求offline messages
@@ -212,36 +197,36 @@ public class RemoteAccountManager {
 //                final long lastMid = 0;
                 if (!dbExist) {
                     Logger.d(TAG, "database not exist, request groups from server");
-//                    try {
-//                        // 此时Local是从一个空的数据库读取的数据，
-//                        // groups from server完成后通知Local，Local会重新执行初始化从数据库读取数据
-//                        RemoteGroupManager.getInstance().getGroupsFromServer(new RemoteCallBack.Stub() {
-//                            @Override
-//                            public void onSuccess(List result) {
-//                                try {
-//                                    callBack.onSuccess(result);
-//                                    RemoteChatManager.getInstance().offlineMsgs(lastMid,null);
-//                                } catch (RemoteException e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onError(int errorCode, String reason) {
-//                                try {
-//                                    callBack.onError(errorCode, reason);
-//                                } catch (RemoteException e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onProgress(int progress, String message) {
-//                            }
-//                        });
-//                    } catch (RemoteException e) {
-//                        e.printStackTrace();
-//                    }
+                    try {
+                        // 此时Local是从一个空的数据库读取的数据，
+                        // groups from server完成后通知Local，Local会重新执行初始化从数据库读取数据
+                        RemoteGroupManager.getInstance().getGroupsFromServer(new RemoteCallBack.Stub() {
+                            @Override
+                            public void onSuccess(List result) {
+                                try {
+                                    callBack.onSuccess(result);
+                                    RemoteChatManager.getInstance().offlineMsgs(lastMid,null);
+                                } catch (RemoteException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onError(int errorCode, String reason) {
+                                try {
+                                    callBack.onError(errorCode, reason);
+                                } catch (RemoteException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onProgress(int progress, String message) {
+                            }
+                        });
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
                 } else {
                     Logger.d(TAG, "database already exist, enter application immediately");
                     try {
@@ -250,36 +235,36 @@ public class RemoteAccountManager {
                         e.printStackTrace();
                     }
                     Logger.d(TAG, "database already exist, request offline messages from server");
-//                    RemoteChatManager.getInstance().offlineMsgs(lastMid, new RemoteCallBack.Stub() {
-//
-//                        @Override
-//                        public void onSuccess(List result) {
-//                            requestGroups();
-//                        }
-//
-//                        @Override
-//                        public void onError(int errorCode, String reason) {
-//                            requestGroups();
-//                        }
-//
-//                        @Override
-//                        public void onProgress(int progress, String message) {
-//                        }
-//
-//                        private void requestGroups() {
-//                            // 按需更新groups contacts
-//                            if (updateFriend || updateGroup) {
-//                                try {
-//                                    RemoteGroupManager.getInstance().getGroupsFromServer(null);
-//                                } catch (RemoteException e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                        }
-//                    });
+                    RemoteChatManager.getInstance().offlineMsgs(lastMid, new RemoteCallBack.Stub() {
+
+                        @Override
+                        public void onSuccess(List result) {
+                            requestGroups();
+                        }
+
+                        @Override
+                        public void onError(int errorCode, String reason) {
+                            requestGroups();
+                        }
+
+                        @Override
+                        public void onProgress(int progress, String message) {
+                        }
+
+                        private void requestGroups() {
+                            // 按需更新groups contacts
+                            if (updateFriend || updateGroup) {
+                                try {
+                                    RemoteGroupManager.getInstance().getGroupsFromServer(null);
+                                } catch (RemoteException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
                 }
 
-//                RemoteContactManager.getInstance().clientService(null);
+                RemoteContactManager.getInstance().clientService(null);
                 Logger.d(TAG, "-------------------------------登录操作到此完成-------------------------");
             }
         };
@@ -342,6 +327,44 @@ public class RemoteAccountManager {
                 && (!TextUtils.isEmpty(code) && validTime > System.currentTimeMillis());
     }
 
+    public void logout(final RemoteCallBack callBack) {
+        RemoteConnectionManager.getInstance().addPacketListener(new PacketReceivedListener() {
+            @Override
+            public void onReceivedPacket(BasePacket pkt) {
+                if (pkt.getPacketType() == BasePacket.PacketType.LOGOUT_REPLY) {
+                    RemoteConnectionManager.getInstance().removePacketListener(this);
+                    RemoteChatManager.getInstance().onLoggedOut(false);
+                    try {
+                        callBack.onSuccess(null);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                    onLoggedOut();
+                    Logger.e(TAG, "log out --- disconnect!!!!!!!!");
+                    RemoteConnectionManager.getInstance().disconnect();
+                }
+            }
+        });
+        LogoutPacket pkt = new LogoutPacket();
+        RemoteConnectionManager.getInstance().writeAndFlushPacket(pkt, callBack);
+    }
+
+    /** 添加登录状态监听，目前只有binder会调用 */
+    public void addLogStatusListener(RemoteLoggedStatusListener l) {
+        if (l == null) {
+            return;
+        }
+        if (!mLoggedListeners.contains(l)) {
+            mLoggedListeners.add(l);
+        }
+    }
+
+    /** 移除Local的监听 */
+    public void removeLogStatusListener() {
+        mLoggedListeners.clear();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     private void callbackOnSuccess(RemoteCallBack callBack, List result) {
         if (callBack != null) {
             try {

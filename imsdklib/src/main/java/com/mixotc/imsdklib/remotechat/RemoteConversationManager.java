@@ -36,7 +36,7 @@ public class RemoteConversationManager {
         mConversationListener = conversationListener;
     }
 
-    public void clearConversationListener() {
+    public void removeConversationListener() {
         mConversationListener = null;
     }
 

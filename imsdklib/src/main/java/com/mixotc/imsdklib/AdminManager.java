@@ -1,8 +1,8 @@
 package com.mixotc.imsdklib;
 
 import android.content.Context;
-import android.os.RemoteException;
 
+import com.mixotc.imsdklib.chat.GOIMAccountManager;
 import com.mixotc.imsdklib.chat.GOIMContact;
 import com.mixotc.imsdklib.chat.GOIMContactManager;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
@@ -45,6 +45,13 @@ public final class AdminManager {
         mBindServiceHelper.bind();
     }
 
+    /**
+     * 接触与服务进程的绑定
+     */
+    public void unbindService() {
+        mBindServiceHelper.unbind();
+    }
+
     public Context getApplicationContext() {
         return mContext;
     }
@@ -60,28 +67,14 @@ public final class AdminManager {
      * 获取登录验证码
      */
     public void sendLoginCode(String phone, String email, RemoteCallBack callBack) {
-        RemoteServiceBinder binder = mBindServiceHelper.getBinder();
-        if (binder == null)
-            return;
-        try {
-            binder.sendCode(phone, email, callBack);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        GOIMAccountManager.getInstance().sendLoginCode(phone, email, callBack);
     }
 
     /**
      * 在登录页面进行手动登录操作
      */
     public void login(String phone, String email, String code, RemoteCallBack callBack) {
-        RemoteServiceBinder binder = mBindServiceHelper.getBinder();
-        if (binder == null)
-            return;
-        try {
-            binder.login(phone, email, code, callBack);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        GOIMAccountManager.getInstance().login(phone, email, code, callBack);
     }
 
     /**

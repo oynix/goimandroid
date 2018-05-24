@@ -11,10 +11,10 @@ import com.mixotc.imsdklib.listener.PacketReceivedListener;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
 import com.mixotc.imsdklib.listener.RemoteConnectionListener;
 import com.mixotc.imsdklib.packet.BasePacket;
-import com.mixotc.imsdklib.packet.LogoutPacket;
 import com.mixotc.imsdklib.packet.PacketDecoder;
 import com.mixotc.imsdklib.packet.PacketEncoder;
 import com.mixotc.imsdklib.packet.ReplyPacket;
+import com.mixotc.imsdklib.remotechat.RemoteDBManager;
 import com.mixotc.imsdklib.utils.Logger;
 import com.mixotc.imsdklib.utils.NetUtils;
 
@@ -206,22 +206,14 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
         mChannel.writeAndFlush(pkt);
     }
 
-    /**
-     * 主动登出，向服务器发送logout packet
-     * todo 有待修改，统一使用{@link #writeAndFlushPacket(BasePacket, RemoteCallBack)}发送packet
-     * @return
-     */
-    public long logout() {
-        mLogin = false;
-        if (mHeartBeatThread != null) {
-            mHeartBeatThread.mShouldStop = true;
-            mHeartBeatThread.interrupt();
-            mHeartBeatThread = null;
+    public boolean isLogined() {
+        try {
+            RemoteDBManager.getInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
-
-        LogoutPacket pkt = new LogoutPacket();
-        mChannel.writeAndFlush(pkt);
-        return pkt.getPacketId();
+        return mLogin;
     }
 
     private void callbackOnError(RemoteCallBack callBack, int code, String reason) {

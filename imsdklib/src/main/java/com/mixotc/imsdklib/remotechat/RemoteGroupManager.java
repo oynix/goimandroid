@@ -5,7 +5,6 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 
 import com.mixotc.imsdklib.R;
-import com.mixotc.imsdklib.account.RemoteAccountManager;
 import com.mixotc.imsdklib.chat.GOIMContact;
 import com.mixotc.imsdklib.chat.GOIMGroup;
 import com.mixotc.imsdklib.chat.ListLongParcelable;
@@ -62,7 +61,7 @@ public class RemoteGroupManager {
     }
 
     /**
-     * 添加监听
+     * 添加监听, 目前只有binder调用
      */
     public void addGroupListener(RemoteGroupListener groupListener) {
         if (groupListener == null) {
@@ -76,8 +75,8 @@ public class RemoteGroupManager {
     /**
      * 移除监听
      */
-    public void removeGroupListener(RemoteGroupListener groupListener) {
-        mGroupListeners.remove(groupListener);
+    public void removeGroupListener() {
+        mGroupListeners.clear();
     }
 
     public PacketReceivedListener getGroupNotifyListener() {

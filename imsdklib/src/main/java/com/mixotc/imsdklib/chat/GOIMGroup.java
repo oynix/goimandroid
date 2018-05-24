@@ -3,7 +3,7 @@ package com.mixotc.imsdklib.chat;
 import android.database.Cursor;
 import android.os.Parcel;
 
-import com.mixotc.imsdklib.account.RemoteAccountManager;
+import com.mixotc.imsdklib.remotechat.RemoteAccountManager;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

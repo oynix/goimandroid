@@ -1,19 +1,25 @@
 package com.mixotc.imsdklib.service;
 
 import com.mixotc.imsdklib.RemoteServiceBinder;
-import com.mixotc.imsdklib.account.RemoteAccountManager;
 import com.mixotc.imsdklib.chat.GOIMChatOptions;
 import com.mixotc.imsdklib.chat.GOIMContact;
 import com.mixotc.imsdklib.chat.GOIMConversation;
 import com.mixotc.imsdklib.chat.GOIMFriendRequest;
 import com.mixotc.imsdklib.chat.GOIMGroup;
 import com.mixotc.imsdklib.chat.ListLongParcelable;
+import com.mixotc.imsdklib.connection.RemoteConnectionManager;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
+import com.mixotc.imsdklib.listener.RemoteContactListener;
+import com.mixotc.imsdklib.listener.RemoteConversationListener;
+import com.mixotc.imsdklib.listener.RemoteGroupListener;
+import com.mixotc.imsdklib.listener.RemoteLoggedStatusListener;
 import com.mixotc.imsdklib.message.GOIMMessage;
 import com.mixotc.imsdklib.message.GOIMSystemMessage;
+import com.mixotc.imsdklib.remotechat.RemoteAccountManager;
 import com.mixotc.imsdklib.remotechat.RemoteChatManager;
 import com.mixotc.imsdklib.remotechat.RemoteContactManager;
 import com.mixotc.imsdklib.remotechat.RemoteConversation;
+import com.mixotc.imsdklib.remotechat.RemoteConversationManager;
 import com.mixotc.imsdklib.remotechat.RemoteDBManager;
 import com.mixotc.imsdklib.remotechat.RemoteGroupManager;
 
@@ -33,6 +39,35 @@ import java.util.List;
  */
 public class RemoteBinder extends RemoteServiceBinder.Stub {
 
+    // bind
+    @Override
+    public void addLogStatusListener(RemoteLoggedStatusListener listener) {
+        RemoteAccountManager.getInstance().addLogStatusListener(listener);
+    }
+
+    @Override
+    public void addContactListener(RemoteContactListener listener) {
+        RemoteContactManager.getInstance().addContactListener(listener);
+    }
+
+    @Override
+    public void addGroupListener(RemoteGroupListener listener) {
+        RemoteGroupManager.getInstance().addGroupListener(listener);
+    }
+
+    @Override
+    public void addConversationListener(RemoteConversationListener listener) {
+        RemoteConversationManager.getInstance().setConversationListener(listener);
+    }
+
+    @Override
+    public void removeAllRemoteListeners() {
+        RemoteAccountManager.getInstance().removeLogStatusListener();
+        RemoteContactManager.getInstance().removeContactListener();
+        RemoteGroupManager.getInstance().removeGroupListener();
+        RemoteConversationManager.getInstance().removeConversationListener();
+    }
+
     // Account
     @Override
     public void sendCode(String phone, String email, RemoteCallBack callBack) {
@@ -42,6 +77,21 @@ public class RemoteBinder extends RemoteServiceBinder.Stub {
     @Override
     public void login(String phone, String email, String code, RemoteCallBack callBack) {
         RemoteAccountManager.getInstance().login(phone, email, code, 0, callBack);
+    }
+
+    @Override
+    public boolean isLogin() {
+        return RemoteConnectionManager.getInstance().isLogined();
+    }
+
+    @Override
+    public void logout(RemoteCallBack callback) {
+        RemoteAccountManager.getInstance().logout(callback);
+    }
+
+    @Override
+    public GOIMContact getLoginUser() {
+        return RemoteAccountManager.getInstance().getLoginUser();
     }
 
     // chat

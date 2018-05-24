@@ -5,9 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.os.RemoteException;
 
+import com.mixotc.imsdklib.chat.GOIMAccountManager;
+import com.mixotc.imsdklib.chat.GOIMContactManager;
+import com.mixotc.imsdklib.chat.GOIMConversationManager;
+import com.mixotc.imsdklib.chat.GOIMGroupManager;
 import com.mixotc.imsdklib.service.RemoteService;
-import com.mixotc.imsdklib.utils.Logger;
 
 import static android.content.Context.BIND_AUTO_CREATE;
 
@@ -28,7 +32,14 @@ public class BindServiceHelper {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mServiceBinder = RemoteServiceBinder.Stub.asInterface(service);
-            Logger.d(TAG, "on service connect:" + (mServiceBinder == null));
+            try {
+                mServiceBinder.addLogStatusListener(GOIMAccountManager.getInstance().mLoggedStatusListener);
+                mServiceBinder.addContactListener(GOIMContactManager.getInstance().mContactListener);
+                mServiceBinder.addGroupListener(GOIMGroupManager.getInstance().mGroupListener);
+                mServiceBinder.addConversationListener(GOIMConversationManager.getInstance().mConversationListener);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -61,7 +72,11 @@ public class BindServiceHelper {
      */
     public void unbind() {
         if (mServiceBinder != null) {
-            // TODO: 2018/5/23 移除所有listener ，通过Binder提供的借口方法
+            try {
+                mServiceBinder.removeAllRemoteListeners();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             mContext.unbindService(mServiceConnection);
             Intent intent = new Intent(mContext, mServiceClass);
             mContext.stopService(intent);

@@ -3,7 +3,7 @@ package com.mixotc.imsdklib.service;
 import android.content.Context;
 import android.content.Intent;
 
-import com.mixotc.imsdklib.account.RemoteAccountManager;
+import com.mixotc.imsdklib.remotechat.RemoteAccountManager;
 import com.mixotc.imsdklib.connection.RemoteConnectionManager;
 import com.mixotc.imsdklib.exception.ErrorType;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
@@ -85,7 +85,6 @@ public final class RemoteInitializer {
                         }
                     });
         }
-        Logger.e(TAG, "Service is initialized");
+        Logger.d(TAG, "Service is initialized");
     }
-
 }

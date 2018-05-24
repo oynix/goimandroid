@@ -63,7 +63,7 @@ public class RemoteContactManager {
         mContext = context;
     }
 
-    /** 添加联系人监听 */
+    /** 添加联系人监听, 只有binder会调用 */
     public void addContactListener(RemoteContactListener contactListener) {
         if (contactListener == null) {
             return;
@@ -74,8 +74,8 @@ public class RemoteContactManager {
     }
 
     /** 移除联系人监听 */
-    public void removeContactListener(RemoteContactListener contactListener) {
-        mContactListeners.remove(contactListener);
+    public void removeContactListener() {
+        mContactListeners.clear();
     }
 
     /** 获取packet监听 */

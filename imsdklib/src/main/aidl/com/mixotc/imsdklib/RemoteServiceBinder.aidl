@@ -11,15 +11,29 @@ import com.mixotc.imsdklib.message.GOIMMessage;
 import com.mixotc.imsdklib.message.GOIMSystemMessage;
 import com.mixotc.imsdklib.chat.GOIMConversation;
 import com.mixotc.imsdklib.chat.GOIMChatOptions;
+import com.mixotc.imsdklib.listener.RemoteLoggedStatusListener;
+import com.mixotc.imsdklib.listener.RemoteContactListener;
+import com.mixotc.imsdklib.listener.RemoteGroupListener;
+import com.mixotc.imsdklib.listener.RemoteConversationListener;
 
 interface RemoteServiceBinder {
     /**
      * Demonstrates some basic types that you can use as parameters
      * and return values in AIDL.
      */
+     // bind
+     void addLogStatusListener(RemoteLoggedStatusListener listener);
+     void addContactListener(RemoteContactListener listener);
+     void addGroupListener(RemoteGroupListener listener);
+     void addConversationListener(RemoteConversationListener listener);
+     void remoteAllRemoteListeners();
+
     // account
     void sendCode(String phone, String email, RemoteCallBack callback);
     void login(String phone, String email, String code, RemoteCallBack callback);
+    boolean isLogin();
+    void logout(RemoteCallBack callback);
+    GOIMContact getLoginUser();
 
     // chat
     GOIMChatOptions getChatOptions();

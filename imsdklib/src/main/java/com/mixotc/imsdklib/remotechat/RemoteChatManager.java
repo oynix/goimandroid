@@ -6,7 +6,6 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.mixotc.imsdklib.account.RemoteAccountManager;
 import com.mixotc.imsdklib.chat.GOIMChatOptions;
 import com.mixotc.imsdklib.cloud.GOIMCloudFileManager;
 import com.mixotc.imsdklib.connection.RemoteConnectionManager;
@@ -78,13 +77,7 @@ public class RemoteChatManager {
         SharedPreferencesUtils.getInstance(mContext).putLong(KEY_UPDATE_FRIEND_TIME, 0);
         SharedPreferencesUtils.getInstance(mContext).putLong(KEY_UPDATE_GROUP_TIME, 0);
 
-        // 清除密码错误的次数
-
         removePacketListeners();
-
-//        if (clearDB) {
-//            RemoteDBManager.getInstance().recreateDB();
-//        }
 
         RemoteGroupManager.getInstance().clear();
 //        RemoteContactManager.getInstance().clear();

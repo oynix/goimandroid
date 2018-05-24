@@ -6,6 +6,10 @@ import android.content.Context;
 import com.mixotc.imsdklib.chat.GOIMAccountManager;
 import com.mixotc.imsdklib.chat.GOIMContact;
 import com.mixotc.imsdklib.chat.GOIMContactManager;
+import com.mixotc.imsdklib.chat.GOIMConversation;
+import com.mixotc.imsdklib.chat.GOIMConversationManager;
+import com.mixotc.imsdklib.chat.GOIMGroup;
+import com.mixotc.imsdklib.chat.GOIMGroupManager;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
 import com.mixotc.imsdklib.service.RemoteService;
 
@@ -103,5 +107,19 @@ public final class AdminManager {
 
     // group
 
+    /**
+     * 获取所有群组
+     */
+    public Map<Long, GOIMGroup> getGroups() {
+        return GOIMGroupManager.getInstance().getGroupList();
+    }
+
     // conversation
+
+    /**
+     * 获取所有对话
+     */
+    public Map<Long, GOIMConversation> getConversations() {
+        return GOIMConversationManager.getInstance().getAllConversations();
+    }
 }

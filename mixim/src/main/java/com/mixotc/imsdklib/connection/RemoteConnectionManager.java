@@ -332,7 +332,7 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
                 }
                 mHeartBeatThread = new HeartbeatTask();
                 mHeartBeatThread.start();
-                Logger.i(TAG, "start heartbeat");
+                Logger.d(TAG, "start heartbeat");
             }
         } else if (packet.getPacketType() == BasePacket.PacketType.LOGOUT_REPLY) {
             Logger.e(TAG, "logout reply disconnect!!!!!!!!");
@@ -348,18 +348,18 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
         public void run() {
             while (!mShouldStop && !isInterrupted()) {
                 try {
-                    Logger.e(TAG, "enter while, before sleep, 当前线程：" + Thread.currentThread());
+//                    Logger.e(TAG, "enter while, before sleep, 当前线程：" + Thread.currentThread());
                     Thread.sleep(defaultHeartBeatTimeOut);
-                    Logger.e(TAG, "after sleep");
+//                    Logger.e(TAG, "after sleep");
                     if (!isInterrupted()) {
-                        Logger.e(TAG, "enter heart beat write");
+//                        Logger.e(TAG, "enter heart beat write");
                         if (!doChannelCheck()) {
                             throw new GOIMException(ErrorType.ERROR_EXCEPTION_SERVER_CONNECTION, "");
                         }
                         BasePacket packet = new BasePacket();
                         packet.setPacketType(BasePacket.PacketType.HEARTBEAT);
                         mChannel.writeAndFlush(packet);
-                        Logger.e(TAG, "enter heart beat write and write finish");
+//                        Logger.e(TAG, "enter heart beat write and write finish");
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();

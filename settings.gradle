@@ -1,1 +1,1 @@
-include ':app', ':mixim'
+include ':sample', ':mixim'

@@ -71,6 +71,7 @@ public final class AdminManager {
         mBindServiceHelper.unbind();
     }
 
+    // account
     /**
      * 获取登录验证码
      */
@@ -92,10 +93,15 @@ public final class AdminManager {
         return GOIMAccountManager.getInstance().isLoggedIn();
     }
 
+    // contact
     /**
      * 获取所有联系人
      */
     public Map<Long, GOIMContact> getContacts() {
         return GOIMContactManager.getInstance().getContactList();
     }
+
+    // group
+
+    // conversation
 }

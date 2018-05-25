@@ -26,7 +26,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 public class RemoteDBManager {
-    private static String TAG = RemoteDBManager.class.getSimpleName();
+    private static final String TAG = RemoteDBManager.class.getSimpleName();
 
     private static RemoteDBManager sDBManager = null;
     private String mParamString = null;
@@ -48,7 +48,7 @@ public class RemoteDBManager {
         }
         sDBManager.mParamString = String.valueOf(userId);
         boolean dbExist = DatabaseUtils.isDatabaseExist(context, DatabaseHelper.getDBNameWithId(userId));
-        Logger.d(TAG, "initialize database complete , is database exist :" + dbExist);
+        Logger.d(TAG, "initialize database complete , if database exist :" + dbExist);
         return dbExist;
     }
 

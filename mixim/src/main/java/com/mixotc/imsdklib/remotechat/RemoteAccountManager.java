@@ -21,7 +21,7 @@ import com.mixotc.imsdklib.packet.ReplyPacket;
 import com.mixotc.imsdklib.packet.SendCodePacket;
 import com.mixotc.imsdklib.utils.DeviceUtil;
 import com.mixotc.imsdklib.utils.Logger;
-import com.mixotc.imsdklib.utils.PathUtil;
+import com.mixotc.imsdklib.utils.UserFilePathManager;
 import com.mixotc.imsdklib.utils.SharedPreferencesIds;
 import com.mixotc.imsdklib.utils.SharedPreferencesUtils;
 
@@ -179,7 +179,7 @@ public class RemoteAccountManager {
                 SharedPreferencesUtils.getInstance(mContext).setLastLoginUser(lastLoginUser);
 
                 boolean dbExist = RemoteDBManager.initDB(mContext, lastLoginUser.getUid());
-                PathUtil.getInstance().initDirs(RemoteAccountManager.getInstance().getLoginUser().getUid(), mContext);
+                UserFilePathManager.getInstance().initDirs(RemoteAccountManager.getInstance().getLoginUser().getUid(), mContext);
 
                 RemoteChatManager.getInstance().onLoggedIn();
                 // 2018/4/26

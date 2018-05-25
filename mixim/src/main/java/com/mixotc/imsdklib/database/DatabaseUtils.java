@@ -259,7 +259,7 @@ public final class DatabaseUtils {
         boolean result = false;
         try {
             File databasePath = context.getDatabasePath(path);
-            result =  databasePath.exists();
+            result = databasePath.exists();
         } catch (Exception e) {
             e.printStackTrace();
         }

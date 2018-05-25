@@ -9,7 +9,7 @@ import com.mixotc.imsdklib.exception.ErrorType;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
 import com.mixotc.imsdklib.utils.FileUtils;
 import com.mixotc.imsdklib.utils.Logger;
-import com.mixotc.imsdklib.utils.PathUtil;
+import com.mixotc.imsdklib.utils.UserFilePathManager;
 
 import java.io.File;
 import java.security.MessageDigest;
@@ -113,13 +113,13 @@ public class GOIMMessageUtils {
                     File parent;
                     String mime = body.getMime();
                     if (mime.startsWith("image/")) {
-                        parent = PathUtil.getInstance().getImagePath(context);
+                        parent = UserFilePathManager.getInstance().getImagePath(context);
                     } else if (mime.startsWith("audio/")) {
-                        parent = PathUtil.getInstance().getVoicePath(context);
+                        parent = UserFilePathManager.getInstance().getVoicePath(context);
                     } else if (mime.startsWith("video/")) {
-                        parent = PathUtil.getInstance().getVideoPath(context);
+                        parent = UserFilePathManager.getInstance().getVideoPath(context);
                     } else {
-                        parent = PathUtil.getInstance().getFilePath(context);
+                        parent = UserFilePathManager.getInstance().getFilePath(context);
                     }
                     File file = new File(parent, body.getRemoteId() + "." + FileUtils.getFileExtension(body.getMime()));
                     return file.getAbsolutePath();
@@ -134,7 +134,7 @@ public class GOIMMessageUtils {
         if (message.getBody() instanceof ImageMessageBody || message.getBody() instanceof VideoMessageBody) {
             String localUrl = getLocalFilePath(context, message);
             if (!TextUtils.isEmpty(localUrl) && !localUrl.equals("null")) {
-                File file = new File(PathUtil.getInstance().getThumbPath(context), MD5(localUrl) + ".jpg");
+                File file = new File(UserFilePathManager.getInstance().getThumbPath(context), MD5(localUrl) + ".jpg");
                 return file.getAbsolutePath();
             }
         }
@@ -145,7 +145,7 @@ public class GOIMMessageUtils {
         if (message.getBody() instanceof ImageMessageBody || message.getBody() instanceof VideoMessageBody) {
             String localUrl = getLocalFilePath(context, message);
             if (!TextUtils.isEmpty(localUrl) && !localUrl.equals("null")) {
-                File file = new File(PathUtil.getInstance().getVideoPath(context), MD5(localUrl) + ".mp4");
+                File file = new File(UserFilePathManager.getInstance().getVideoPath(context), MD5(localUrl) + ".mp4");
                 return file.getAbsolutePath();
             }
         }

@@ -3,13 +3,13 @@ package com.mixotc.imsdklib;
 import android.app.Application;
 import android.content.Context;
 
-import com.mixotc.imsdklib.chat.GOIMAccountManager;
+import com.mixotc.imsdklib.chat.manager.LocalAccountManager;
 import com.mixotc.imsdklib.chat.GOIMContact;
-import com.mixotc.imsdklib.chat.GOIMContactManager;
+import com.mixotc.imsdklib.chat.manager.LocalContactManager;
 import com.mixotc.imsdklib.chat.GOIMConversation;
-import com.mixotc.imsdklib.chat.GOIMConversationManager;
+import com.mixotc.imsdklib.chat.manager.LocalConversationManager;
 import com.mixotc.imsdklib.chat.GOIMGroup;
-import com.mixotc.imsdklib.chat.GOIMGroupManager;
+import com.mixotc.imsdklib.chat.manager.LocalGroupManager;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
 import com.mixotc.imsdklib.service.RemoteService;
 import com.mixotc.imsdklib.utils.AppUtils;
@@ -84,21 +84,21 @@ public final class AdminManager {
      * 获取登录验证码
      */
     public void sendLoginCode(String phone, String email, RemoteCallBack callBack) {
-        GOIMAccountManager.getInstance().sendLoginCode(phone, email, callBack);
+        LocalAccountManager.getInstance().sendLoginCode(phone, email, callBack);
     }
 
     /**
      * 在登录页面进行手动登录操作
      */
     public void login(String phone, String email, String code, RemoteCallBack callBack) {
-        GOIMAccountManager.getInstance().login(phone, email, code, callBack);
+        LocalAccountManager.getInstance().login(phone, email, code, callBack);
     }
 
     /**
      * 查看当前是否是登录状态
      */
     public boolean isLogin() {
-        return GOIMAccountManager.getInstance().isLoggedIn();
+        return LocalAccountManager.getInstance().isLoggedIn();
     }
 
     // contact
@@ -112,7 +112,7 @@ public final class AdminManager {
      * 获取所有联系人
      */
     public Map<Long, GOIMContact> getContacts() {
-        return GOIMContactManager.getInstance().getContactList();
+        return LocalContactManager.getInstance().getContactList();
     }
 
     /**
@@ -121,7 +121,7 @@ public final class AdminManager {
      * @return
      */
     public GOIMContact getContactById(long uid) {
-        return GOIMContactManager.getInstance().getContactByUid(uid);
+        return LocalContactManager.getInstance().getContactByUid(uid);
     }
 
     // group
@@ -130,7 +130,7 @@ public final class AdminManager {
      * 获取所有群组
      */
     public Map<Long, GOIMGroup> getGroups() {
-        return GOIMGroupManager.getInstance().getGroupList();
+        return LocalGroupManager.getInstance().getGroupList();
     }
 
     // conversation
@@ -139,6 +139,6 @@ public final class AdminManager {
      * 获取所有对话
      */
     public Map<Long, GOIMConversation> getConversations() {
-        return GOIMConversationManager.getInstance().getAllConversations();
+        return LocalConversationManager.getInstance().getAllConversations();
     }
 }

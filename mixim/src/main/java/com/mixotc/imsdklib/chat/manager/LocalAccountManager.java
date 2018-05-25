@@ -1,9 +1,10 @@
-package com.mixotc.imsdklib.chat;
+package com.mixotc.imsdklib.chat.manager;
 
 import android.os.RemoteException;
 
 import com.mixotc.imsdklib.AdminManager;
 import com.mixotc.imsdklib.RemoteServiceBinder;
+import com.mixotc.imsdklib.chat.GOIMContact;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
 import com.mixotc.imsdklib.listener.RemoteLoggedStatusListener;
 import com.mixotc.imsdklib.utils.Logger;
@@ -12,21 +13,21 @@ import com.mixotc.imsdklib.utils.Logger;
  * Created by junnikokuki on 2017/9/8.
  */
 
-public class GOIMAccountManager {
+public class LocalAccountManager {
 
-    private static final String TAG = GOIMAccountManager.class.getSimpleName();
+    private static final String TAG = LocalAccountManager.class.getSimpleName();
 
     private static final class LazyHolder {
-        private static final GOIMAccountManager INSTANCE = new GOIMAccountManager();
+        private static final LocalAccountManager INSTANCE = new LocalAccountManager();
     }
 
 //    private Context mContext = null;
 
-    private GOIMAccountManager() {
+    private LocalAccountManager() {
 //        mContext = AdminManager.getInstance().getApplicationContext();
     }
 
-    public static GOIMAccountManager getInstance() {
+    public static LocalAccountManager getInstance() {
         return LazyHolder.INSTANCE;
     }
 
@@ -159,18 +160,18 @@ public class GOIMAccountManager {
         @Override
         public void onLoggedIn() {
             Logger.d(TAG, "-------------------initialize Manager Data: -- local" + Thread.currentThread().getName());
-            GOIMContactManager.getInstance().initData();
-            GOIMGroupManager.getInstance().initData();
-            GOIMConversationManager.getInstance().initData();
+            LocalContactManager.getInstance().initData();
+            LocalGroupManager.getInstance().initData();
+            LocalConversationManager.getInstance().initData();
             Logger.d(TAG, "-------------------after initialize Manager Data: -- local");
         }
 
         @Override
         public void onLoggedOut() {
             Logger.d(TAG, "-------------------clear Manager Data: -- local");
-            GOIMContactManager.getInstance().clear();
-            GOIMGroupManager.getInstance().clear();
-            GOIMConversationManager.getInstance().clear();
+            LocalContactManager.getInstance().clear();
+            LocalGroupManager.getInstance().clear();
+            LocalConversationManager.getInstance().clear();
         }
     };
 }

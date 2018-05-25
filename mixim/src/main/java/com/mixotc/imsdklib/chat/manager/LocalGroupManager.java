@@ -1,9 +1,12 @@
-package com.mixotc.imsdklib.chat;
+package com.mixotc.imsdklib.chat.manager;
 
 import android.os.RemoteException;
 
 import com.mixotc.imsdklib.AdminManager;
 import com.mixotc.imsdklib.RemoteServiceBinder;
+import com.mixotc.imsdklib.chat.GOIMContact;
+import com.mixotc.imsdklib.chat.GOIMGroup;
+import com.mixotc.imsdklib.chat.ListLongParcelable;
 import com.mixotc.imsdklib.exception.ErrorType;
 import com.mixotc.imsdklib.listener.GOIMGroupListener;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
@@ -15,21 +18,21 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class GOIMGroupManager {
-    private static String TAG = GOIMGroupManager.class.getSimpleName();
+public class LocalGroupManager {
+    private static String TAG = LocalGroupManager.class.getSimpleName();
 
-    private static GOIMGroupManager sInstance;
+    private static LocalGroupManager sInstance;
     private final Collection<GOIMGroupListener> mGroupListeners = new CopyOnWriteArrayList<>();
     private Hashtable<Long, GOIMGroup> mGroups = new Hashtable<>(100);
 
-    private GOIMGroupManager() {
+    private LocalGroupManager() {
     }
 
-    public static GOIMGroupManager getInstance() {
+    public static LocalGroupManager getInstance() {
         if (sInstance == null) {
-            synchronized (GOIMGroupManager.class) {
+            synchronized (LocalGroupManager.class) {
                 if (sInstance == null) {
-                    sInstance = new GOIMGroupManager();
+                    sInstance = new LocalGroupManager();
                 }
             }
         }
@@ -63,7 +66,7 @@ public class GOIMGroupManager {
                     if (group == null) {
                         continue;
                     }
-                    group.setMembers(GOIMContactManager.getInstance().getTempContacts(group.getGroupId()));
+                    group.setMembers(LocalContactManager.getInstance().getTempContacts(group.getGroupId()));
                     mGroups.put(group.getGroupId(), group);
                 }
             } catch (RemoteException e) {

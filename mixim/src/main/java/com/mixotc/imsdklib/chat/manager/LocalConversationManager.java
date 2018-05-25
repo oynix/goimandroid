@@ -1,5 +1,7 @@
-package com.mixotc.imsdklib.chat;
+package com.mixotc.imsdklib.chat.manager;
 
+import com.mixotc.imsdklib.chat.GOIMConversation;
+import com.mixotc.imsdklib.chat.GOIMGroup;
 import com.mixotc.imsdklib.listener.GOIMConversationListener;
 import com.mixotc.imsdklib.listener.RemoteConversationListener;
 import com.mixotc.imsdklib.message.GOIMMessage;
@@ -11,25 +13,25 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 
-public class GOIMConversationManager {
-    private static final String TAG = GOIMConversationManager.class.getSimpleName();
+public class LocalConversationManager {
+    private static final String TAG = LocalConversationManager.class.getSimpleName();
 
     private static final int DEFAULT_LOAD_MESSAGE_COUNT = 20;
 
-    private static GOIMConversationManager sInstance;
+    private static LocalConversationManager sInstance;
     private Hashtable<String, GOIMMessage> mAllMessages = new Hashtable<>();
     private Hashtable<Long, GOIMConversation> mConversations = new Hashtable<>(50);
     private GOIMConversation mSystemConversation = null;
     private List<GOIMConversationListener> mConversationListeners = new ArrayList<>();
 
-    private GOIMConversationManager() {
+    private LocalConversationManager() {
     }
 
-    public static GOIMConversationManager getInstance() {
+    public static LocalConversationManager getInstance() {
         if (sInstance == null) {
-            synchronized (GOIMConversationManager.class) {
+            synchronized (LocalConversationManager.class) {
                 if (sInstance == null) {
-                    sInstance = new GOIMConversationManager();
+                    sInstance = new LocalConversationManager();
                 }
             }
         }
@@ -50,7 +52,7 @@ public class GOIMConversationManager {
     public void initData() {
         mConversations.clear();
         mAllMessages.clear();
-        mConversations.putAll(GOIMChatDBProxy.getInstance().loadAllConversationsWithoutMessage(GOIMChatManager.getInstance().getChatOptions().getNumberOfMessagesLoaded()));
+        mConversations.putAll(LocalChatDBProxy.getInstance().loadAllConversationsWithoutMessage(LocalChatManager.getInstance().getChatOptions().getNumberOfMessagesLoaded()));
         for (GOIMConversation conversation : mConversations.values()) {
             for (GOIMMessage message : conversation.getAllMessages()) {
                 mAllMessages.put(message.getMsgId(), message);
@@ -71,10 +73,10 @@ public class GOIMConversationManager {
 
 //    private synchronized void loadAllConversationsWithoutMessage(int count) {
 //        mConversations = new Hashtable<>();
-//        mConversations = GOIMChatDBProxy.getInstance().loadAllConversationsWithoutMessage(count);
+//        mConversations = LocalChatDBProxy.getInstance().loadAllConversationsWithoutMessage(count);
 //        Iterator iterator;
 //        GOIMConversation conversation;
-//        synchronized (GOIMConversationManager.class) {
+//        synchronized (LocalConversationManager.class) {
 //            iterator = mConversations.values().iterator();
 //            while (iterator.hasNext()) {
 //                conversation = (GOIMConversation) iterator.next();
@@ -86,8 +88,8 @@ public class GOIMConversationManager {
 //                // 如果是被动退出的群进行显示。
 //                if (conversation.getGroup() == null && conversation.getGroupId() > 0 && conversation.isSingle()) {
 //                    Logger.e(TAG, "过滤删除conversation，delete :" + conversation.getName() + ", isSingle:" + conversation.isSingle());
-//                    GOIMChatDBProxy.getInstance().deleteConversionMsgs(conversation.getGroupId());
-//                    GOIMChatDBProxy.getInstance().deleteConversation(conversation.getGroupId());
+//                    LocalChatDBProxy.getInstance().deleteConversionMsgs(conversation.getGroupId());
+//                    LocalChatDBProxy.getInstance().deleteConversation(conversation.getGroupId());
 //                    List<GOIMMessage> messages = conversation.getAllMessages();
 //                    for (GOIMMessage message : messages) {
 //                        mAllMessages.remove(message.getMsgId());
@@ -107,8 +109,8 @@ public class GOIMConversationManager {
     /** 从列表主动删除一个conversation */
     public void deleteConversation(long groupId) {
         Logger.d(TAG, "remove conversation for user: " + groupId);
-        GOIMChatDBProxy.getInstance().deleteConversionMsgs(groupId);
-        GOIMChatDBProxy.getInstance().deleteConversation(groupId);
+        LocalChatDBProxy.getInstance().deleteConversionMsgs(groupId);
+        LocalChatDBProxy.getInstance().deleteConversation(groupId);
         GOIMConversation conversation = mConversations.remove(groupId);
         if (conversation == null) {
             return;
@@ -123,7 +125,7 @@ public class GOIMConversationManager {
     /** 清空聊天记录 */
     public void clearConversation(long groupId) {
         Logger.d(TAG, "clear conversation for user: " + groupId);
-        GOIMChatDBProxy.getInstance().deleteConversionMsgs(groupId);
+        LocalChatDBProxy.getInstance().deleteConversionMsgs(groupId);
         GOIMConversation conversation = mConversations.get(groupId);
         if (conversation == null) {
             return;
@@ -139,7 +141,7 @@ public class GOIMConversationManager {
     private GOIMConversation getSystemConversation() {
         if (mSystemConversation == null) {
             mSystemConversation = new GOIMConversation(0, "系统通知", null, 0, false, false, true);
-            GOIMSystemMessage lastSystemMsg = GOIMChatDBProxy.getInstance().getLastSystemMsg();
+            GOIMSystemMessage lastSystemMsg = LocalChatDBProxy.getInstance().getLastSystemMsg();
             if (lastSystemMsg != null) {
                 mSystemConversation.setLastMsgTime(lastSystemMsg.getMsgTime());
                 mSystemConversation.setLastMsgText(lastSystemMsg.getMsgText());
@@ -150,13 +152,13 @@ public class GOIMConversationManager {
 
     /** 清空系统conversation */
     public void clearSystemConversation() {
-        GOIMChatDBProxy.getInstance().clearAllSystemMsgs();
+        LocalChatDBProxy.getInstance().clearAllSystemMsgs();
         getSystemConversation().addSystemMessage(null);
     }
 
     /** 清除未读的系统通知消息 */
     public void clearUnreadSystemMsg() {
-        GOIMChatDBProxy.getInstance().clearUnreadSystemMsgs();
+        LocalChatDBProxy.getInstance().clearUnreadSystemMsgs();
         getSystemConversation().resetUnreadMsgCount();
     }
 
@@ -201,7 +203,7 @@ public class GOIMConversationManager {
         Logger.d(TAG, "save message:" + message.getMsgId());
         try {
             addMessageToM(message, unread);
-            GOIMChatDBProxy.getInstance().saveMsgToDB(message);
+            LocalChatDBProxy.getInstance().saveMsgToDB(message);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -246,9 +248,9 @@ public class GOIMConversationManager {
     // 当conversation不存在时，新建一个conversation
     private GOIMConversation createConversation(long groupId) {
         Logger.d(TAG, "load create conversation :" + groupId);
-        List<GOIMMessage> messages = GOIMChatDBProxy.getInstance().loadMessageById(groupId, null, DEFAULT_LOAD_MESSAGE_COUNT);
-        long count = GOIMChatDBProxy.getInstance().getMsgCount(groupId);
-        GOIMGroup group = GOIMGroupManager.getInstance().getGroupById(groupId);
+        List<GOIMMessage> messages = LocalChatDBProxy.getInstance().loadMessageById(groupId, null, DEFAULT_LOAD_MESSAGE_COUNT);
+        long count = LocalChatDBProxy.getInstance().getMsgCount(groupId);
+        GOIMGroup group = LocalGroupManager.getInstance().getGroupById(groupId);
         GOIMConversation conversation = new GOIMConversation(groupId, "", messages, count, false, true, true);
         if (group != null) {
             conversation.setIsSingle(group.isSingle());
@@ -263,7 +265,7 @@ public class GOIMConversationManager {
     /** 更改conversation的置顶状态 */
     public void setConversationOnTop(long groupId, boolean isOnTop) {
         Logger.d(TAG, "set on top for conversation:" + groupId);
-        GOIMChatDBProxy.getInstance().setConversationOnTop(groupId, isOnTop);
+        LocalChatDBProxy.getInstance().setConversationOnTop(groupId, isOnTop);
         GOIMConversation conversation = mConversations.get(groupId);
         if (conversation != null) {
             conversation.setIsOnTop(isOnTop);
@@ -306,7 +308,7 @@ public class GOIMConversationManager {
 
             // 2018/4/16 更新之后服务器会发送新的通知，随后RemoteGroupManager会进行相应更新
             // update group id
-//            ConcurrentHashMap<Long, GOIMGroup> groups = GOIMGroupManager.getInstance().getGroupList();
+//            ConcurrentHashMap<Long, GOIMGroup> groups = LocalGroupManager.getInstance().getGroupList();
 //            GOIMGroup group = groups.remove(oldGroupId);
 //            if (newGroupId > 0) {
 //                group.setGroupId(newGroupId);

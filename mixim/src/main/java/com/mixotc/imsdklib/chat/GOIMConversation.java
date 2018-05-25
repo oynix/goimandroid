@@ -8,6 +8,11 @@ import android.text.TextUtils;
 
 import com.mixotc.imsdklib.AdminManager;
 import com.mixotc.imsdklib.R;
+import com.mixotc.imsdklib.chat.manager.LocalChatDBProxy;
+import com.mixotc.imsdklib.chat.manager.LocalChatManager;
+import com.mixotc.imsdklib.chat.manager.LocalContactManager;
+import com.mixotc.imsdklib.chat.manager.LocalConversationManager;
+import com.mixotc.imsdklib.chat.manager.LocalGroupManager;
 import com.mixotc.imsdklib.message.GOIMMessage;
 import com.mixotc.imsdklib.message.GOIMSystemMessage;
 import com.mixotc.imsdklib.message.TextMessageBody;
@@ -101,7 +106,7 @@ public class GOIMConversation implements Parcelable {
         mGroupId = groupId;
         mIsOnTop = isOnTop;
         mIsSingle = isSingle;
-        mGroup = GOIMGroupManager.getInstance().getGroupById(groupId);
+        mGroup = LocalGroupManager.getInstance().getGroupById(groupId);
         mName = name;
         if (TextUtils.isEmpty(mName)) {
             if (mGroup != null) {
@@ -115,7 +120,7 @@ public class GOIMConversation implements Parcelable {
                 }
             } else {
                 if (groupId < 0) {
-                    GOIMContact anonymousContact = GOIMContactManager.getInstance().getAnonymousContact(-groupId);
+                    GOIMContact anonymousContact = LocalContactManager.getInstance().getAnonymousContact(-groupId);
                     if (anonymousContact != null) {
                         mName = anonymousContact.getNick();
                     }
@@ -129,7 +134,7 @@ public class GOIMConversation implements Parcelable {
             mMessages = Collections.synchronizedList(messages);
         }
         if (mUnreadMsgCount <= 0) {
-            mUnreadMsgCount = mGroupId == 0 ? GOIMChatDBProxy.getInstance().getUnreadSystemMsgs() : GOIMChatDBProxy.getInstance().getUnreadCount(groupId);
+            mUnreadMsgCount = mGroupId == 0 ? LocalChatDBProxy.getInstance().getUnreadSystemMsgs() : LocalChatDBProxy.getInstance().getUnreadCount(groupId);
         }
         if (mMessages.size() > 0) {
             GOIMMessage lastMsg = mMessages.get(mMessages.size() - 1);
@@ -142,7 +147,7 @@ public class GOIMConversation implements Parcelable {
 //            if (groupId < 0) {
 //                mIsSingle = true;
 //            } else if (groupId > 0) {
-//                GOIMContact contact = GOIMContactManager.getInstance().getContactByGroupId(groupId);
+//                GOIMContact contact = LocalContactManager.getInstance().getContactByGroupId(groupId);
 //                Logger.e(TAG, name + "构造函数初始化isSingle，getContactByGroupId是否为null：" + (contact == null));
 //                mIsSingle = contact != null;
 //            }
@@ -183,15 +188,15 @@ public class GOIMConversation implements Parcelable {
             mLastMsgTime = message.getMsgTime();
             mLastMsgText = getMessageDigest(message, AdminManager.getInstance().getApplicationContext());
             if (toDB) {
-                GOIMChatDBProxy.getInstance().saveConversation(this);
+                LocalChatDBProxy.getInstance().saveConversation(this);
             }
         }
     }
 
     private void saveUnreadMsgCount(final int unreadMsgCount) {
-        GOIMChatManager.getInstance().mMsgCountThreadPool.submit(new Runnable() {
+        LocalChatManager.getInstance().mMsgCountThreadPool.submit(new Runnable() {
             public void run() {
-                GOIMChatDBProxy.getInstance().saveUnreadCount(mGroupId, unreadMsgCount);
+                LocalChatDBProxy.getInstance().saveUnreadCount(mGroupId, unreadMsgCount);
             }
         });
     }
@@ -248,10 +253,10 @@ public class GOIMConversation implements Parcelable {
 
     public List<GOIMMessage> loadMoreMsgFromDB(String startMsgId, int count) {
         Logger.d(TAG, "load more msg from db gid:" + getGroupId() + ", start:" + startMsgId + ", count:" + count);
-        List<GOIMMessage> messages = GOIMChatDBProxy.getInstance().loadMessageById(mGroupId, startMsgId, count);
+        List<GOIMMessage> messages = LocalChatDBProxy.getInstance().loadMessageById(mGroupId, startMsgId, count);
         mMessages.addAll(0, messages);
         for (GOIMMessage message : messages) {
-            GOIMConversationManager.getInstance().addMessageToM(message, false);
+            LocalConversationManager.getInstance().addMessageToM(message, false);
         }
         if (mMessages.size() > 0) {
             GOIMMessage lastMsg = mMessages.get(mMessages.size() - 1);
@@ -349,7 +354,7 @@ public class GOIMConversation implements Parcelable {
 
     public GOIMGroup getGroup() {
         if (mGroup == null) {
-            mGroup = GOIMGroupManager.getInstance().getGroupById(mGroupId);
+            mGroup = LocalGroupManager.getInstance().getGroupById(mGroupId);
         }
         return mGroup;
     }
@@ -368,8 +373,8 @@ public class GOIMConversation implements Parcelable {
                 }
                 mMessages.remove(i);
 
-                GOIMChatDBProxy.getInstance().deleteMsg(msgId);
-                GOIMConversationManager.getInstance().removeMessage(msgId);
+                LocalChatDBProxy.getInstance().deleteMsg(msgId);
+                LocalConversationManager.getInstance().removeMessage(msgId);
                 break;
             }
         }
@@ -394,7 +399,7 @@ public class GOIMConversation implements Parcelable {
         mMessages.clear();
         mUnreadMsgCount = 0;
         mLastMsgText = "";
-        GOIMChatDBProxy.getInstance().clearUnread(mGroupId);
+        LocalChatDBProxy.getInstance().clearUnread(mGroupId);
     }
 
     /**

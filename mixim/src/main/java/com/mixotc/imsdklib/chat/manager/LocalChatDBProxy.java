@@ -1,9 +1,10 @@
-package com.mixotc.imsdklib.chat;
+package com.mixotc.imsdklib.chat.manager;
 
 import android.os.RemoteException;
 
 import com.mixotc.imsdklib.AdminManager;
 import com.mixotc.imsdklib.RemoteServiceBinder;
+import com.mixotc.imsdklib.chat.GOIMConversation;
 import com.mixotc.imsdklib.message.GOIMMessage;
 import com.mixotc.imsdklib.message.GOIMSystemMessage;
 import com.mixotc.imsdklib.utils.Logger;
@@ -15,23 +16,18 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-public class GOIMChatDBProxy {
-    private static String TAG = GOIMChatDBProxy.class.getSimpleName();
+public class LocalChatDBProxy {
+    private static String TAG = LocalChatDBProxy.class.getSimpleName();
 
-    private static GOIMChatDBProxy sChatDBCore = null;
-
-    private GOIMChatDBProxy() {
+    private static final class LazyHolder {
+        private static final LocalChatDBProxy INSTANCE = new LocalChatDBProxy();
     }
 
-    public static synchronized GOIMChatDBProxy getInstance() {
-        if (sChatDBCore == null) {
-            synchronized (GOIMChatDBProxy.class) {
-                if (sChatDBCore == null) {
-                    sChatDBCore = new GOIMChatDBProxy();
-                }
-            }
-        }
-        return sChatDBCore;
+    private LocalChatDBProxy() {
+    }
+
+    public static synchronized LocalChatDBProxy getInstance() {
+        return LazyHolder.INSTANCE;
     }
 
     public void saveMsgToDB(GOIMMessage message) {

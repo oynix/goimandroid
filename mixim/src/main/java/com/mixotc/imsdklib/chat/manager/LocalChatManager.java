@@ -1,54 +1,33 @@
-package com.mixotc.imsdklib.chat;
+package com.mixotc.imsdklib.chat.manager;
 
 import android.os.RemoteException;
 
 import com.mixotc.imsdklib.AdminManager;
 import com.mixotc.imsdklib.RemoteServiceBinder;
+import com.mixotc.imsdklib.chat.GOIMChatOptions;
 import com.mixotc.imsdklib.exception.GOIMException;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
 import com.mixotc.imsdklib.message.GOIMMessage;
-import com.mixotc.imsdklib.utils.Logger;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class GOIMChatManager {
-    private static final String TAG = "GOIMChatManager";
+public class LocalChatManager {
+    private static final String TAG = "LocalChatManager";
 
-    private static GOIMChatManager sInstance;
+    private static final class LazyHolder {
+        private static final LocalChatManager INSTANCE = new LocalChatManager();
+    }
 
     public ExecutorService mMsgCountThreadPool;
 
-    private GOIMChatManager() {
+    private LocalChatManager() {
         mMsgCountThreadPool = Executors.newSingleThreadExecutor();
     }
 
-    public static synchronized GOIMChatManager getInstance() {
-        if (sInstance == null) {
-            synchronized (GOIMChatManager.class) {
-                if (sInstance == null) {
-                    sInstance = new GOIMChatManager();
-                }
-            }
-        }
-        return sInstance;
-    }
-
-    // 登录成功后回调，初始化Local数据
-    public void initManagerData() {
-        Logger.e(TAG, "~~~~~~~~~~~~~~~~~~~initialize Manager Data: -- local");
-        GOIMContactManager.getInstance().initData();
-        GOIMGroupManager.getInstance().initData();
-        GOIMConversationManager.getInstance().initData();
-        Logger.e(TAG, "~~~~~~~~~~~~~~~~~~~after initialize Manager Data: -- local");
-    }
-
-    public void clearManagerData() {
-        Logger.e(TAG, "~~~~~~~~~~~~~~~~~~~clear Manager Data: -- local");
-        GOIMContactManager.getInstance().clear();
-        GOIMGroupManager.getInstance().clear();
-        GOIMConversationManager.getInstance().clear();
+    public static synchronized LocalChatManager getInstance() {
+        return LazyHolder.INSTANCE;
     }
 
     private void callbackOnError(RemoteCallBack callBack, int code, String reason) {
@@ -115,15 +94,15 @@ public class GOIMChatManager {
 
     public void setMessageListened(GOIMMessage message) {
 //        message.setListened(true);
-//        GOIMChatDBProxy.getInstance().f(message.getMsgId(), true);
+//        LocalChatDBProxy.getInstance().f(message.getMsgId(), true);
     }
 
     public GOIMMessage getMessage(String msgId) {
-        return GOIMConversationManager.getInstance().getMessage(msgId);
+        return LocalConversationManager.getInstance().getMessage(msgId);
     }
 
     public int getUnreadMsgCount() {
-        return GOIMConversationManager.getInstance().getUnreadMessageCount() + GOIMChatDBProxy.getInstance().getUnreadSystemMsgs();
+        return LocalConversationManager.getInstance().getUnreadMessageCount() + LocalChatDBProxy.getInstance().getUnreadSystemMsgs();
     }
 
     public void activityResumed() {
@@ -138,11 +117,11 @@ public class GOIMChatManager {
     }
 
     public boolean updateMessageBody(GOIMMessage message) {
-        return GOIMChatDBProxy.getInstance().updateMessageBody(message);
+        return LocalChatDBProxy.getInstance().updateMessageBody(message);
     }
 
     private void updateMessageState(GOIMMessage message) {
-        GOIMChatDBProxy.getInstance().updateMsgStatus(message.getMsgId(), message.getStatus().ordinal());
+        LocalChatDBProxy.getInstance().updateMsgStatus(message.getMsgId(), message.getStatus().ordinal());
     }
 
     public GOIMChatOptions getChatOptions() {

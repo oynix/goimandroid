@@ -7,10 +7,10 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 
-import com.mixotc.imsdklib.chat.GOIMAccountManager;
-import com.mixotc.imsdklib.chat.GOIMContactManager;
-import com.mixotc.imsdklib.chat.GOIMConversationManager;
-import com.mixotc.imsdklib.chat.GOIMGroupManager;
+import com.mixotc.imsdklib.chat.manager.LocalAccountManager;
+import com.mixotc.imsdklib.chat.manager.LocalContactManager;
+import com.mixotc.imsdklib.chat.manager.LocalConversationManager;
+import com.mixotc.imsdklib.chat.manager.LocalGroupManager;
 import com.mixotc.imsdklib.service.RemoteService;
 import com.mixotc.imsdklib.utils.AppUtils;
 import com.mixotc.imsdklib.utils.Logger;
@@ -36,10 +36,10 @@ public class BindServiceHelper {
             mServiceBinder = RemoteServiceBinder.Stub.asInterface(service);
             try {
                 Logger.d(TAG, "绑定成功，向远程服务注册监听器");
-                mServiceBinder.addLogStatusListener(GOIMAccountManager.getInstance().mLoggedStatusListener);
-                mServiceBinder.addContactListener(GOIMContactManager.getInstance().mContactListener);
-                mServiceBinder.addGroupListener(GOIMGroupManager.getInstance().mGroupListener);
-                mServiceBinder.addConversationListener(GOIMConversationManager.getInstance().mConversationListener);
+                mServiceBinder.addLogStatusListener(LocalAccountManager.getInstance().mLoggedStatusListener);
+                mServiceBinder.addContactListener(LocalContactManager.getInstance().mContactListener);
+                mServiceBinder.addGroupListener(LocalGroupManager.getInstance().mGroupListener);
+                mServiceBinder.addConversationListener(LocalConversationManager.getInstance().mConversationListener);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }

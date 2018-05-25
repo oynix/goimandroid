@@ -89,7 +89,7 @@ public class ConversationTableProvider extends BaseIMTableProvider {
                 cursor.close();
             }
         }
-        Logger.d(TAG, "加载所有conversation耗时：" + (System.currentTimeMillis() - start));
+        Logger.d(TAG, "加载所有conversation耗时：" + (System.currentTimeMillis() - start) + ",size:" + result.size());
         return result;
     }
 

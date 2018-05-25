@@ -91,7 +91,7 @@ public class GroupTableProvider extends BaseIMTableProvider {
                 cursor.close();
             }
         }
-        Logger.d(TAG, "load groups from db:" + result.size());
+        Logger.d(TAG, "load groups without members from db, count:" + result.size());
         return result;
     }
 

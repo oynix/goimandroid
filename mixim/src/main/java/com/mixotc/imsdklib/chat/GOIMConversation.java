@@ -251,19 +251,26 @@ public class GOIMConversation implements Parcelable {
         return message;
     }
 
-    public List<GOIMMessage> loadMoreMsgFromDB(String startMsgId, int count) {
-        Logger.d(TAG, "load more msg from db gid:" + getGroupId() + ", start:" + startMsgId + ", count:" + count);
-        List<GOIMMessage> messages = LocalChatDBProxy.getInstance().loadMessageById(mGroupId, startMsgId, count);
-        mMessages.addAll(0, messages);
-        for (GOIMMessage message : messages) {
-            LocalConversationManager.getInstance().addMessageToM(message, false);
-        }
+//    public List<GOIMMessage> loadMoreMsgFromDB(String startMsgId, int count) {
+//        List<GOIMMessage> messages = LocalChatDBProxy.getInstance().loadMessageById(mGroupId, startMsgId, count);
+//        mMessages.addAll(0, messages);
+//        for (GOIMMessage message : messages) {
+//            LocalConversationManager.getInstance().addMessageToM(message, false);
+//        }
+//        if (mMessages.size() > 0) {
+//            GOIMMessage lastMsg = mMessages.get(mMessages.size() - 1);
+//            mLastMsgTime = lastMsg.getMsgTime();
+//            mLastMsgText = getMessageDigest(lastMsg, AdminManager.getInstance().getApplicationContext());
+//        }
+//        return messages;
+//    }
+
+    public void updateLastMsgInfo() {
         if (mMessages.size() > 0) {
             GOIMMessage lastMsg = mMessages.get(mMessages.size() - 1);
             mLastMsgTime = lastMsg.getMsgTime();
             mLastMsgText = getMessageDigest(lastMsg, AdminManager.getInstance().getApplicationContext());
         }
-        return messages;
     }
 
     public GOIMMessage getMessage(String msgId) {

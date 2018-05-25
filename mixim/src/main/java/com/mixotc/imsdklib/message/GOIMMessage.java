@@ -7,6 +7,7 @@ import android.util.Pair;
 
 import com.mixotc.imsdklib.chat.GOIMContact;
 import com.mixotc.imsdklib.database.table.ChatTable;
+import com.mixotc.imsdklib.remotechat.RemoteDBManager;
 import com.mixotc.imsdklib.utils.Logger;
 
 import org.json.JSONArray;
@@ -426,11 +427,7 @@ public class GOIMMessage implements Parcelable, Cloneable {
         long groupId = cursor.getLong(cursor.getColumnIndex(ChatTable.GROUP_ID));
         message.setGroupId(groupId);
         long userId = cursor.getLong(cursor.getColumnIndex(ChatTable.PARTICIPANT));
-        // TODO: 2018/5/23
-//        GOIMContact contact = RemoteDBManager.getInstance().getTempContactById(userId, groupId);
-        GOIMContact contact = null;
-//        Hashtable<Long, GOIMContact> contacts = RemoteContactManager.getInstance().getTempContacts(groupId);
-//        GOIMContact contact = contacts.get(userId);
+        GOIMContact contact = RemoteDBManager.getInstance().getTempContactById(userId, groupId);
         if (contact != null) {
             message.setContact(contact);
         } else {

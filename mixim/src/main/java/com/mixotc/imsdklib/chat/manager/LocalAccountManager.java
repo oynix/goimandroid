@@ -105,12 +105,12 @@ public class LocalAccountManager {
         return loginUser;
     }
 
-    /**
-     * 获取用户信息
-     *
-     * @param userId   ID
-     * @param callBack 回调
-     */
+//    /**
+//     * 获取用户信息
+//     *
+//     * @param userId   ID
+//     * @param callBack 回调
+//     */
 //    public void getUserInfo(long userId, final GOIMCallBack callBack) {
 //        if (!doCheck(callBack)) {
 //            return;
@@ -157,13 +157,14 @@ public class LocalAccountManager {
 
 
     public RemoteLoggedStatusListener mLoggedStatusListener = new RemoteLoggedStatusListener.Stub() {
+
+        // after login successfully, this callback will be called to load data from database to memory by binder.
         @Override
         public void onLoggedIn() {
-            Logger.d(TAG, "-------------------initialize Manager Data: -- local" + Thread.currentThread().getName());
+            Logger.d(TAG, "-------------------initialize Manager load data to memory: -- local");
             LocalContactManager.getInstance().initData();
             LocalGroupManager.getInstance().initData();
             LocalConversationManager.getInstance().initData();
-            Logger.d(TAG, "-------------------after initialize Manager Data: -- local");
         }
 
         @Override

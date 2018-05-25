@@ -104,7 +104,8 @@ public class TempContactTableProvider extends BaseIMTableProvider {
         Hashtable<Long, GOIMContact> result = new Hashtable<>();
         Cursor cursor = null;
         try {
-            cursor = mHelper.query(TABLE_NAME, null, GROUP_ID + "=?", new String[]{String.valueOf(groupId)}, null, null, null);
+            cursor = mHelper.query(TABLE_NAME, null, GROUP_ID + "=?",
+                    new String[]{String.valueOf(groupId)}, null, null, null);
             if (cursor == null) {
                 return result;
             }
@@ -131,7 +132,8 @@ public class TempContactTableProvider extends BaseIMTableProvider {
     /** 删除group id为传入值的所有contact */
     public void deleteContactByGroupId(long groupId) {
         try {
-            DeleteParams params = new DeleteParams(TABLE_NAME, GROUP_ID + "=?", new String[]{String.valueOf(groupId)});
+            DeleteParams params = new DeleteParams(TABLE_NAME, GROUP_ID + "=?",
+                    new String[]{String.valueOf(groupId)});
             mHelper.delete(params);
             Logger.d(TAG, "delete member of group id:" + groupId);
         } catch (DatabaseException e) {
@@ -146,7 +148,8 @@ public class TempContactTableProvider extends BaseIMTableProvider {
             contentValues.put(USER_NAME, contact.getUsername());
             contentValues.put(NICK_NAME, contact.getNick());
             contentValues.put(AVATAR, contact.getAvatar());
-            UpdateParams params = new UpdateParams(TABLE_NAME, USER_ID + "=?", new String[]{String.valueOf(contact.getUid())}, contentValues);
+            UpdateParams params = new UpdateParams(TABLE_NAME, USER_ID + "=?",
+                    new String[]{String.valueOf(contact.getUid())}, contentValues);
             mHelper.update(params);
             Logger.d(TAG, "update temp contact base info to db:" + contact.toString());
         } catch (DatabaseException e) {
@@ -159,7 +162,8 @@ public class TempContactTableProvider extends BaseIMTableProvider {
         GOIMContact result = null;
         Cursor cursor = null;
         try {
-            cursor = mHelper.query(TABLE_NAME, null, USER_ID + "=? AND " + GROUP_ID + "=?", new String[]{String.valueOf(uid), String.valueOf(groupId)}, null, null, null);
+            cursor = mHelper.query(TABLE_NAME, null, USER_ID + "=? AND " + GROUP_ID + "=?",
+                    new String[]{String.valueOf(uid), String.valueOf(groupId)}, null, null, null);
             if (cursor == null) {
                 return null;
             }
@@ -181,7 +185,8 @@ public class TempContactTableProvider extends BaseIMTableProvider {
         GOIMContact result = null;
         Cursor cursor = null;
         try {
-            cursor = mHelper.query(TABLE_NAME, null, USER_ID + "=?", new String[]{String.valueOf(uid)}, null, null, null);
+            cursor = mHelper.query(TABLE_NAME, null, USER_ID + "=?",
+                    new String[]{String.valueOf(uid)}, null, null, null);
             if (cursor == null) {
                 return null;
             }
@@ -213,7 +218,8 @@ public class TempContactTableProvider extends BaseIMTableProvider {
         try {
             List<DeleteParams> params = new ArrayList<>();
             for (Long user : users) {
-                DeleteParams param = new DeleteParams(TABLE_NAME, TEMP_ID + "=?", new String[]{user + "|" + groupId});
+                DeleteParams param = new DeleteParams(TABLE_NAME, TEMP_ID + "=?",
+                        new String[]{user + "|" + groupId});
                 params.add(param);
             }
             mHelper.delete(params);

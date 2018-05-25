@@ -7,7 +7,6 @@ import com.mixotc.imsdklib.RemoteServiceBinder;
 import com.mixotc.imsdklib.chat.GOIMConversation;
 import com.mixotc.imsdklib.message.GOIMMessage;
 import com.mixotc.imsdklib.message.GOIMSystemMessage;
-import com.mixotc.imsdklib.utils.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -111,9 +110,8 @@ public class LocalChatDBProxy {
     }
 
     // 为避免aidl传输数据过大，这里只加载conversation不加载message
-    public Hashtable<Long, GOIMConversation> loadAllConversationsWithoutMessage(int count) {
-        Logger.d(TAG, "load all conversations :" + count);
-        Hashtable<Long, GOIMConversation> hashtable = new Hashtable<>();
+    public Hashtable<Long, GOIMConversation> getConversationsWithoutMessage(int count) {
+        Hashtable<Long, GOIMConversation> result = new Hashtable<>();
         RemoteServiceBinder binder = AdminManager.getInstance().getBinder();
         if (binder != null) {
             try {
@@ -143,20 +141,19 @@ public class LocalChatDBProxy {
                         // 与被对方删除的conversation,无法获取对方的id，可通过遍历消息，如果有非登录人发送的消息则认为是对方
                         // 如果消息列表为空，或者全部为登录的用户自己发送的消息，则直接将该条conversation删除
                         // 行不通，因为被删除的用户本地没有存储其信息
-                        Logger.w(TAG, "load " + conversation.isSingle() + "<-single" +conversation.getGroupId() + ", message count:" + conversation.getAllMsgCount() + "transfer from RemoteDB:" + conversation.getName() + (conversation.getGroup() == null));
+//                        Logger.w(TAG, "load " + conversation.isSingle() + "<-single" +conversation.getGroupId() + ", message count:" + conversation.getAllMsgCount() + "transfer from RemoteDB:" + conversation.getName() + (conversation.getGroup() == null));
 //                        if (conversation.getGroup() == null && conversation.getGroupId() > 0 && conversation.isSingle()) {
 //
 //                        } else {
 //                        }
-                        conversation.loadMoreMsgFromDB(null, 20);
-                        hashtable.put(conversation.getGroupId(), conversation);
+                        result.put(conversation.getGroupId(), conversation);
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        return hashtable;
+        return result;
     }
 
     public void deleteConversation(long groupId) {
@@ -261,7 +258,6 @@ public class LocalChatDBProxy {
     }
 
     public List<GOIMMessage> loadMessageById(long groupId, String startMsgId, int count) {
-        Logger.d(TAG, "load message by last id :" + groupId + ", start: " + startMsgId + ", count:" + count);
         List<GOIMMessage> messages = new ArrayList<>();
         RemoteServiceBinder binder = AdminManager.getInstance().getBinder();
         if (binder != null) {

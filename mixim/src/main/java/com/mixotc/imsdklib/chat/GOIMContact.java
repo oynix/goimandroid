@@ -322,7 +322,7 @@ public class GOIMContact implements Parcelable {
 
     // TODO: 2018/4/19 constructor需要重构
 
-    /** 从临时联系人表李创建实例 */
+    /** 从临时联系人表里创建实例 */
     public static GOIMContact createFromTempCursor(Cursor cursor) {
         long uid = cursor.getLong(cursor.getColumnIndex(TempContactTable.USER_ID));
         String username = cursor.getString(cursor.getColumnIndex(TempContactTable.USER_NAME));

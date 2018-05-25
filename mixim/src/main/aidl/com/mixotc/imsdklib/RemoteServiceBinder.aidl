@@ -57,7 +57,7 @@ interface RemoteServiceBinder {
     void updateUserBaseInfo(long userId, RemoteCallBack callback);
 
     // group
-    List<GOIMGroup> getGroupListWithoutMember();
+    List<GOIMGroup> getGroupsWithoutMember();
     void createGroupActive(String groupname, String intro, in ListLongParcelable members, RemoteCallBack callback);
     void deleteGroupActive(long groupId, RemoteCallBack callback);
     void quitGroupActive(long groupId, RemoteCallBack callback);

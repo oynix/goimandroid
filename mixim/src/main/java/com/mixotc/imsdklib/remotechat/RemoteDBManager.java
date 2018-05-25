@@ -129,7 +129,7 @@ public class RemoteDBManager {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public Hashtable<Long, RemoteConversation> loadAllConversationsWithoutMessage(int count) {
+    public Hashtable<Long, RemoteConversation> getConversationsWithoutMessage(int count) {
         ConversationTableProvider provider = mProviderFactory.createProvider(ConversationTableProvider.class);
         return provider.loadAllConversation();
     }
@@ -229,7 +229,6 @@ public class RemoteDBManager {
     }
 
     public synchronized List<GOIMContact> loadContacts() {
-        Logger.e(TAG, "load all contacts");
         ContactTableProvider provider = mProviderFactory.createProvider(ContactTableProvider.class);
         return provider.loadAllContacts();
     }

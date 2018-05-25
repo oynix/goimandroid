@@ -126,6 +126,7 @@ public class RemoteBinder extends RemoteServiceBinder.Stub {
     @Override
     public List<GOIMContact> loadTempContacts(long groupId) {
         if (groupId < 0) {
+            // 非好友的情况
             List<GOIMContact> result = new ArrayList<>();
             GOIMContact tempContact = RemoteDBManager.getInstance().getExTempContact(-groupId);
             if (tempContact != null) {
@@ -193,13 +194,13 @@ public class RemoteBinder extends RemoteServiceBinder.Stub {
 
     // Group
     @Override
-    public List<GOIMGroup> getGroupListWithoutMember() {
+    public List<GOIMGroup> getGroupsWithoutMember() {
         return RemoteDBManager.getInstance().loadAllGroupsWithoutMember();
     }
 
     @Override
-    public void createGroupActive(String groupname, String intro, ListLongParcelable members, RemoteCallBack callback) {
-        RemoteGroupManager.getInstance().createGroupActive(groupname, intro, members, callback);
+    public void createGroupActive(String groupName, String intro, ListLongParcelable members, RemoteCallBack callback) {
+        RemoteGroupManager.getInstance().createGroupActive(groupName, intro, members, callback);
     }
 
     @Override
@@ -265,7 +266,7 @@ public class RemoteBinder extends RemoteServiceBinder.Stub {
 
     @Override
     public String loadAllConversationsWithoutMessage(int count) {
-        Hashtable<Long, RemoteConversation> conversations = RemoteDBManager.getInstance().loadAllConversationsWithoutMessage(count);
+        Hashtable<Long, RemoteConversation> conversations = RemoteDBManager.getInstance().getConversationsWithoutMessage(count);
         JSONArray jConversations = new JSONArray();
         for (RemoteConversation conversation : conversations.values()) {
             long groupId = conversation.getGroupId();

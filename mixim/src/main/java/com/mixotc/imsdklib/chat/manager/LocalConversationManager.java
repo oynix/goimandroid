@@ -16,10 +16,14 @@ import java.util.List;
 public class LocalConversationManager {
     private static final String TAG = LocalConversationManager.class.getSimpleName();
 
+    private static final class LazyHolder {
+        private static final LocalConversationManager INSTANCE = new LocalConversationManager();
+    }
+
+    /** conversation首次加载时默认加载的消息条数 */
     private static final int DEFAULT_LOAD_MESSAGE_COUNT = 20;
 
-    private static LocalConversationManager sInstance;
-    private Hashtable<String, GOIMMessage> mAllMessages = new Hashtable<>();
+    private Hashtable<String, GOIMMessage> mAllMessages = new Hashtable<>(50);
     private Hashtable<Long, GOIMConversation> mConversations = new Hashtable<>(50);
     private GOIMConversation mSystemConversation = null;
     private List<GOIMConversationListener> mConversationListeners = new ArrayList<>();
@@ -28,37 +32,7 @@ public class LocalConversationManager {
     }
 
     public static LocalConversationManager getInstance() {
-        if (sInstance == null) {
-            synchronized (LocalConversationManager.class) {
-                if (sInstance == null) {
-                    sInstance = new LocalConversationManager();
-                }
-            }
-        }
-        return sInstance;
-    }
-
-    public void addConversationListener(GOIMConversationListener l) {
-        if (!mConversationListeners.contains(l)) {
-            mConversationListeners.add(l);
-        }
-    }
-
-    public void removeConversationListener(GOIMConversationListener l) {
-        mConversationListeners.remove(l);
-    }
-
-    // TODO: 2018/4/19 conversation需要做成分页加载。
-    public void initData() {
-        mConversations.clear();
-        mAllMessages.clear();
-        mConversations.putAll(LocalChatDBProxy.getInstance().loadAllConversationsWithoutMessage(LocalChatManager.getInstance().getChatOptions().getNumberOfMessagesLoaded()));
-        for (GOIMConversation conversation : mConversations.values()) {
-            for (GOIMMessage message : conversation.getAllMessages()) {
-                mAllMessages.put(message.getMsgId(), message);
-            }
-        }
-        Logger.d(TAG,  "~~~~~~~~~~~~~~~~~~~GOIM Conversation Manager initialize data, size:" + mConversations.size());
+        return LazyHolder.INSTANCE;
     }
 
     public void clear() {
@@ -71,40 +45,29 @@ public class LocalConversationManager {
         mSystemConversation = null;
     }
 
-//    private synchronized void loadAllConversationsWithoutMessage(int count) {
-//        mConversations = new Hashtable<>();
-//        mConversations = LocalChatDBProxy.getInstance().loadAllConversationsWithoutMessage(count);
-//        Iterator iterator;
-//        GOIMConversation conversation;
-//        synchronized (LocalConversationManager.class) {
-//            iterator = mConversations.values().iterator();
-//            while (iterator.hasNext()) {
-//                conversation = (GOIMConversation) iterator.next();
-//                Logger.e(TAG, "before :" + conversation.getName() + ", isSingle:" + conversation.isSingle() + ",group null:" + (conversation.getGroup() == null) + conversation.getGroupId());
-//                // judge the conversation is legal or not
-//                // if there is no group and group id is larger then 0 to show that
-//                // this conversation is with ex-friend or ex-group
-//                // delete it
-//                // 如果是被动退出的群进行显示。
-//                if (conversation.getGroup() == null && conversation.getGroupId() > 0 && conversation.isSingle()) {
-//                    Logger.e(TAG, "过滤删除conversation，delete :" + conversation.getName() + ", isSingle:" + conversation.isSingle());
-//                    LocalChatDBProxy.getInstance().deleteConversionMsgs(conversation.getGroupId());
-//                    LocalChatDBProxy.getInstance().deleteConversation(conversation.getGroupId());
-//                    List<GOIMMessage> messages = conversation.getAllMessages();
-//                    for (GOIMMessage message : messages) {
-//                        mAllMessages.remove(message.getMsgId());
-//                    }
-//                    conversation.clear();
-//                    iterator.remove();
-//                    continue;
-//                }
-//                // if it is legal conversation, do following operations.
-//                for (GOIMMessage message : conversation.getAllMessages()) {
-//                    mAllMessages.put(message.getMsgId(), message);
-//                }
-//            }
-//        }
-//    }
+    // TODO: 2018/4/19 conversation需要做成分页加载。
+    public synchronized void initData() {
+        mConversations.clear();
+        mAllMessages.clear();
+        mConversations.putAll(LocalChatDBProxy.getInstance().getConversationsWithoutMessage(DEFAULT_LOAD_MESSAGE_COUNT));
+        for (GOIMConversation conversation : mConversations.values()) {
+            loadMoreMsgFromDbToConversation(conversation);
+        }
+        Logger.d(TAG,  "GOIM Conversation Manager initialize data, size:" + mConversations.size());
+    }
+
+    public void addConversationListener(GOIMConversationListener l) {
+        if (l == null) {
+            return;
+        }
+        if (!mConversationListeners.contains(l)) {
+            mConversationListeners.add(l);
+        }
+    }
+
+    public void removeConversationListener(GOIMConversationListener l) {
+        mConversationListeners.remove(l);
+    }
 
     /** 从列表主动删除一个conversation */
     public void deleteConversation(long groupId) {
@@ -170,6 +133,22 @@ public class LocalConversationManager {
         mAllMessages.remove(msgId);
     }
 
+    /** 加载更多消息到conversation和memory */
+    public void loadMoreMsgFromDbToConversation(GOIMConversation conversation) {
+        long groupId = conversation.getGroupId();
+        List<GOIMMessage> existMsgs = conversation.getAllMessages();
+        String startMsgId = null;
+        if (existMsgs.size() > 0) {
+            startMsgId = existMsgs.get(0).getMsgId();
+        }
+        List<GOIMMessage> messages = LocalChatDBProxy.getInstance().loadMessageById(groupId, startMsgId, DEFAULT_LOAD_MESSAGE_COUNT);
+        existMsgs.addAll(0, messages);
+        for (GOIMMessage message : messages) {
+            addMessageToM(message, false);
+        }
+        conversation.updateLastMsgInfo();
+    }
+
     /** 获取所有conversation，包括系统消息conversation */
     public Hashtable<Long, GOIMConversation> getAllConversations() {
         GOIMConversation systemConversation = getSystemConversation();
@@ -185,7 +164,7 @@ public class LocalConversationManager {
 
     /** 从数据库加载的消息，添加到LocalManager */
     public void addMessageToM(GOIMMessage message, boolean unread) {
-        Logger.d(TAG, "add message to memory :" + message.toString());
+//        Logger.d(TAG, "add message to memory :" + message.toString());
         String msgId = message.getMsgId();
         if (mAllMessages.containsKey(msgId)) {
             return;

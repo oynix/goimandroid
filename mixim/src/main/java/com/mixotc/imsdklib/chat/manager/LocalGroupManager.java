@@ -13,34 +13,53 @@ import com.mixotc.imsdklib.listener.RemoteCallBack;
 import com.mixotc.imsdklib.listener.RemoteGroupListener;
 import com.mixotc.imsdklib.utils.Logger;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class LocalGroupManager {
     private static String TAG = LocalGroupManager.class.getSimpleName();
 
-    private static LocalGroupManager sInstance;
-    private final Collection<GOIMGroupListener> mGroupListeners = new CopyOnWriteArrayList<>();
+    private static final class LazyHolder {
+        private static final LocalGroupManager INSTANCE = new LocalGroupManager();
+    }
+
+    private final List<GOIMGroupListener> mGroupListeners = new ArrayList<>();
     private Hashtable<Long, GOIMGroup> mGroups = new Hashtable<>(100);
 
     private LocalGroupManager() {
     }
 
     public static LocalGroupManager getInstance() {
-        if (sInstance == null) {
-            synchronized (LocalGroupManager.class) {
-                if (sInstance == null) {
-                    sInstance = new LocalGroupManager();
-                }
-            }
-        }
-        return sInstance;
+        return LazyHolder.INSTANCE;
     }
 
     public void clear() {
         mGroups.clear();
+    }
+
+    public synchronized void initData() {
+        mGroups.clear();
+        RemoteServiceBinder binder = AdminManager.getInstance().getBinder();
+        if (binder != null) {
+            try {
+                List<GOIMGroup> groupList = binder.getGroupsWithoutMember();
+                for (GOIMGroup group : groupList) {
+                    if (group == null) {
+                        continue;
+                    }
+                    Hashtable<Long, GOIMContact> members = LocalContactManager.getInstance().getTempContacts(group.getGroupId());
+                    if (members.size() <=0) {
+                        continue;
+                    }
+                    group.setMembers(members);
+                    mGroups.put(group.getGroupId(), group);
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        Logger.d(TAG, "GOIM Group Manager initialize data, size :" + mGroups.values().size());
     }
 
     public void addGroupListener(GOIMGroupListener groupListener) {
@@ -54,26 +73,6 @@ public class LocalGroupManager {
 
     public void removeGroupListener(GOIMGroupListener groupListener) {
         mGroupListeners.remove(groupListener);
-    }
-
-    public synchronized void initData() {
-        mGroups.clear();
-        RemoteServiceBinder binder = AdminManager.getInstance().getBinder();
-        if (binder != null) {
-            try {
-                List<GOIMGroup> groupList = binder.getGroupListWithoutMember();
-                for (GOIMGroup group : groupList) {
-                    if (group == null) {
-                        continue;
-                    }
-                    group.setMembers(LocalContactManager.getInstance().getTempContacts(group.getGroupId()));
-                    mGroups.put(group.getGroupId(), group);
-                }
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-        Logger.e(TAG, "~~~~~~~~~~~~~~~~~~~GOIM Group Manager initialize data, size :" + mGroups.values().size());
     }
 
     public GOIMGroup getGroupById(long groupId) {

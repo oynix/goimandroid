@@ -215,7 +215,6 @@ public class ChatTableProvider extends BaseIMTableProvider {
      * @return 查询结果
      */
     public List<GOIMMessage> loadMsgByLastId(long groupId, String lastMsgId, int count) {
-        Logger.e(TAG, "load message by last id invoked");
         List<GOIMMessage> result = new ArrayList<>();
         Cursor cursor = null;
         try {
@@ -241,7 +240,6 @@ public class ChatTableProvider extends BaseIMTableProvider {
                 if (message == null) {
                     continue;
                 }
-                Logger.e(TAG, "add message to list:" + message.toString());
                 result.add(0, message);
             }
         } catch (DatabaseException e) {
@@ -251,7 +249,7 @@ public class ChatTableProvider extends BaseIMTableProvider {
                 cursor.close();
             }
         }
-        Logger.d(TAG, "load msgs size:" + result.size() + " for groupid:" + groupId);
+        Logger.d(TAG, "load msgs size:" + result.size() + " for group id:" + groupId);
         return result;
     }
 

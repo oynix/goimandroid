@@ -78,7 +78,8 @@ public class ContactTableProvider extends BaseIMTableProvider {
     /** 删除一个联系人 */
     public void deleteContact(long uid) {
         try {
-            DeleteParams params = new DeleteParams(TABLE_NAME, USER_ID + "=?", new String[]{String.valueOf(uid)});
+            DeleteParams params = new DeleteParams(TABLE_NAME, USER_ID + "=?",
+                    new String[]{String.valueOf(uid)});
             mHelper.delete(params);
             Logger.e(TAG, "delete contact uid:" + uid);
         } catch (DatabaseException e) {
@@ -91,7 +92,8 @@ public class ContactTableProvider extends BaseIMTableProvider {
         List<GOIMContact> result = new ArrayList<>();
         Cursor cursor = null;
         try {
-            cursor = mHelper.query(TABLE_NAME, null, null, null, null, null, null);
+            cursor = mHelper.query(TABLE_NAME, null, null, null,
+                    null, null, null);
             if (cursor == null) {
                 return result;
             }
@@ -106,7 +108,7 @@ public class ContactTableProvider extends BaseIMTableProvider {
                 cursor.close();
             }
         }
-        Logger.e(TAG, "loaded contacts from db:" + result.size());
+        Logger.d(TAG, "loaded contacts from db:" + result.size());
         return result;
     }
 
@@ -118,7 +120,8 @@ public class ContactTableProvider extends BaseIMTableProvider {
             contentValues.put(USER_NAME, contact.getUsername());
             contentValues.put(NICK_NAME, contact.getNick());
             contentValues.put(AVATAR, contact.getAvatar());
-            UpdateParams params = new UpdateParams(TABLE_NAME, USER_ID + "=?", new String[]{String.valueOf(contact.getUid())}, contentValues);
+            UpdateParams params = new UpdateParams(TABLE_NAME, USER_ID + "=?",
+                    new String[]{String.valueOf(contact.getUid())}, contentValues);
             rowsAffected = mHelper.update(params);
             Logger.e(TAG, "update contact base info to db:" + contact.toString());
         } catch (DatabaseException e) {
@@ -132,7 +135,8 @@ public class ContactTableProvider extends BaseIMTableProvider {
         GOIMContact contact = null;
         Cursor cursor = null;
         try {
-            cursor = mHelper.query(TABLE_NAME, null,USER_ID + "=?", new String[]{String.valueOf(uid)}, null, null, null);
+            cursor = mHelper.query(TABLE_NAME, null,USER_ID + "=?",
+                    new String[]{String.valueOf(uid)}, null, null, null);
             if (cursor == null) {
                 return null;
             }
@@ -154,7 +158,8 @@ public class ContactTableProvider extends BaseIMTableProvider {
         boolean result = false;
         Cursor cursor = null;
         try {
-            cursor = mHelper.query(TABLE_NAME, null, USER_ID + "=?", new String[]{String.valueOf(uid)}, null, null, null);
+            cursor = mHelper.query(TABLE_NAME, null, USER_ID + "=?",
+                    new String[]{String.valueOf(uid)}, null, null, null);
             if (cursor == null) {
                 return false;
             }

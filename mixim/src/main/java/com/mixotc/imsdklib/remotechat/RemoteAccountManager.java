@@ -168,7 +168,7 @@ public class RemoteAccountManager {
                     callbackOnError(callBack, ErrorType.ERROR_EXCEPTION_UNEXPECTED_RESPONSE_ERROR, reason);
                     return;
                 }
-                Logger.d(TAG, lastLoginUser.getNick() + "---------成功登录，开始初始化----------");
+                Logger.d(TAG, "current user name:" + lastLoginUser.getNick() + "---------成功登录，开始初始化----------");
 
                 final boolean updateFriend = SharedPreferencesUtils.getInstance(mContext).updateTime(KEY_UPDATE_FRIEND_TIME, data.optLong("friend", -1));
                 final boolean updateGroup = SharedPreferencesUtils.getInstance(mContext).updateTime(KEY_UPDATE_GROUP_TIME, data.optLong("group", -1));
@@ -190,10 +190,10 @@ public class RemoteAccountManager {
                 // 根据offline message更新数据库数据，保证本地数据库数据不会错乱(无法处理从该设备退出后，在其他设备操作过后又回到该设备)，
                 // 完成后再按需请求groups from server，同步服务器端数据库
 
-                Logger.d(TAG, "before onLoggedIn()");
+                Logger.i(TAG, "before onLoggedIn()");
                 // when called this method, local manager will load data to memory from database by binder.
                 onLoggedIn();
-                Logger.d(TAG, "after onLoggedIn()");
+                Logger.i(TAG, "after onLoggedIn()");
                 final long lastMid = SharedPreferencesUtils.getInstance(mContext).getLong(KEY_LAST_MSG_ID, 0);
                 if (!dbExist) {
                     Logger.d(TAG, "database not exist, request groups from server");

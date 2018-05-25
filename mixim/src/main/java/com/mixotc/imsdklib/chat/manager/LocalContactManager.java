@@ -8,15 +8,14 @@ import com.mixotc.imsdklib.RemoteServiceBinder;
 import com.mixotc.imsdklib.chat.GOIMContact;
 import com.mixotc.imsdklib.chat.GOIMFriendRequest;
 import com.mixotc.imsdklib.chat.GOIMGroup;
-import com.mixotc.imsdklib.remotechat.RemoteAccountManager;
 import com.mixotc.imsdklib.exception.ErrorType;
 import com.mixotc.imsdklib.listener.GOIMContactListener;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
 import com.mixotc.imsdklib.listener.RemoteContactListener;
+import com.mixotc.imsdklib.remotechat.RemoteAccountManager;
 import com.mixotc.imsdklib.utils.Logger;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -24,24 +23,20 @@ import java.util.Map;
 public class LocalContactManager {
     private static final String TAG = LocalContactManager.class.getSimpleName();
 
-    private static LocalContactManager sInstance;
+    private static final class LazyHolder {
+        private static final LocalContactManager INSTANCE = new LocalContactManager();
+    }
+
     private Map<Long, GOIMContact> mContactMap = new Hashtable<>(100);
     // group与其的group member对应表
     private Hashtable<Long, Hashtable<Long, GOIMContact>> mTempGroupContactTable = new Hashtable<>(100);
-    private Collection<GOIMContactListener> mContactListeners = new ArrayList<>();
+    private List<GOIMContactListener> mContactListeners = new ArrayList<>();
 
     private LocalContactManager() {
     }
 
     public static LocalContactManager getInstance() {
-        if (sInstance == null) {
-            synchronized (LocalContactManager.class) {
-                if (sInstance == null) {
-                    sInstance = new LocalContactManager();
-                }
-            }
-        }
-        return sInstance;
+        return LazyHolder.INSTANCE;
     }
 
     public void clear() {
@@ -49,8 +44,7 @@ public class LocalContactManager {
     }
 
     // 登录成功后初始化数据
-    public void initData() {
-        Logger.d(TAG, "-----------------before GOIM Contact Manager initialize data from remote database, size :");
+    public synchronized void initData() {
         RemoteServiceBinder binder = AdminManager.getInstance().getBinder();
         if (binder != null) {
             mContactMap.clear();
@@ -63,7 +57,7 @@ public class LocalContactManager {
                 e.printStackTrace();
             }
         }
-        Logger.d(TAG, "----------------GOIM Contact Manager initialize data from remote database, size :" + mContactMap.size());
+        Logger.d(TAG, "GOIM Contact Manager initialize data from remote database, size :" + mContactMap.size());
     }
 
     /** 添加listener */

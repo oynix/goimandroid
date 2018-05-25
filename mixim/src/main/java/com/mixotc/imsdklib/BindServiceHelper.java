@@ -13,6 +13,7 @@ import com.mixotc.imsdklib.chat.GOIMConversationManager;
 import com.mixotc.imsdklib.chat.GOIMGroupManager;
 import com.mixotc.imsdklib.service.RemoteService;
 import com.mixotc.imsdklib.utils.AppUtils;
+import com.mixotc.imsdklib.utils.Logger;
 
 import static android.content.Context.BIND_AUTO_CREATE;
 
@@ -34,6 +35,7 @@ public class BindServiceHelper {
         public void onServiceConnected(ComponentName name, IBinder service) {
             mServiceBinder = RemoteServiceBinder.Stub.asInterface(service);
             try {
+                Logger.d(TAG, "绑定成功，向远程服务注册监听器");
                 mServiceBinder.addLogStatusListener(GOIMAccountManager.getInstance().mLoggedStatusListener);
                 mServiceBinder.addContactListener(GOIMContactManager.getInstance().mContactListener);
                 mServiceBinder.addGroupListener(GOIMGroupManager.getInstance().mGroupListener);
@@ -45,6 +47,8 @@ public class BindServiceHelper {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            Logger.d(TAG, "解除绑定成功，移除向远程服务注册监听器");
+            unbind();
         }
     };
 
@@ -61,12 +65,12 @@ public class BindServiceHelper {
             return;
         }
         if (mServiceBinder == null) {
-            Intent intent = new Intent(mContext, mServiceClass);
-            // onCreate onStartCommand
-            mContext.startService(intent);
+//            Intent intent = new Intent(mContext, mServiceClass);
+//            // onCreate onStartCommand
+//            mContext.startService(intent);
 
             Intent intent2 = new Intent(mContext, mServiceClass);
-            // onCreate onBind
+            // onCreate onBind onBind共生死
             mContext.bindService(intent2, mServiceConnection, BIND_AUTO_CREATE);
         }
     }
@@ -82,9 +86,10 @@ public class BindServiceHelper {
                 e.printStackTrace();
             }
             mContext.unbindService(mServiceConnection);
-            Intent intent = new Intent(mContext, mServiceClass);
-            mContext.stopService(intent);
+//            Intent intent = new Intent(mContext, mServiceClass);
+//            mContext.stopService(intent);
         }
+        mServiceBinder = null;
     }
 
     public RemoteServiceBinder getBinder() {

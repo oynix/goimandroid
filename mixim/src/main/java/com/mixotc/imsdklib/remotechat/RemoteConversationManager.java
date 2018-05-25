@@ -24,7 +24,6 @@ public class RemoteConversationManager {
     }
 
     public void init(Context context) {
-        Logger.e(TAG, "init context == null ?" + (context == null));
         mContext = context;
     }
 

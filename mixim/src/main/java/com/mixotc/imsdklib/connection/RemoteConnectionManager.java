@@ -319,7 +319,7 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
     // 每接收到一个packet，就要遍历所有listener分别执行处理packet
     @Override
     public void onReceivedPacket(BasePacket packet) {
-        mListenerExecutor.submit(new PacketListenerNotification(packet));
+        mListenerExecutor.submit(new ListenerTravelTask(packet));
         if (packet.getPacketType() == BasePacket.PacketType.LOGIN_REPLY) {
             ReplyPacket replyPacket = new ReplyPacket(packet);
             int ret = replyPacket.getResult();
@@ -335,12 +335,12 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
                 Logger.d(TAG, "start heartbeat");
             }
         } else if (packet.getPacketType() == BasePacket.PacketType.LOGOUT_REPLY) {
-            Logger.e(TAG, "logout reply disconnect!!!!!!!!");
+            Logger.d(TAG, "logout reply disconnect!!!!!!!!");
             disconnect();
         }
     }
 
-    class HeartbeatTask extends Thread {
+    private class HeartbeatTask extends Thread {
         private int defaultHeartBeatTimeOut = 15000;
         volatile boolean mShouldStop = false;
 
@@ -348,18 +348,14 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
         public void run() {
             while (!mShouldStop && !isInterrupted()) {
                 try {
-//                    Logger.e(TAG, "enter while, before sleep, 当前线程：" + Thread.currentThread());
                     Thread.sleep(defaultHeartBeatTimeOut);
-//                    Logger.e(TAG, "after sleep");
                     if (!isInterrupted()) {
-//                        Logger.e(TAG, "enter heart beat write");
                         if (!doChannelCheck()) {
                             throw new GOIMException(ErrorType.ERROR_EXCEPTION_SERVER_CONNECTION, "");
                         }
                         BasePacket packet = new BasePacket();
                         packet.setPacketType(BasePacket.PacketType.HEARTBEAT);
                         mChannel.writeAndFlush(packet);
-//                        Logger.e(TAG, "enter heart beat write and write finish");
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -380,11 +376,11 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
         }
     }
 
-    private class PacketListenerNotification implements Runnable {
+    private class ListenerTravelTask implements Runnable {
 
         private BasePacket packet;
 
-        PacketListenerNotification(BasePacket packet) {
+        ListenerTravelTask(BasePacket packet) {
             this.packet = packet;
         }
 
@@ -396,7 +392,7 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
         }
     }
 
-    class ReconnectTask extends Thread {
+    private class ReconnectTask extends Thread {
         volatile boolean mShouldStop = false;
 
         @Override
@@ -411,10 +407,10 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
                     }
                     // 有网才尝试登录
                     if (NetUtils.isNetConnected(mContext)) {
-                        Logger.e(TAG, "网络可用，autoLogin");
+                        Logger.d(TAG, "网络可用，autoLogin");
                         autoLogin();
                     } else {
-                        Logger.e(TAG, "网络不可用");
+                        Logger.d(TAG, "网络不可用");
                     }
                     Thread.sleep(10000);
                 } catch (Exception e) {
@@ -429,13 +425,12 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
             String phone = SharedPreferencesUtils.getInstance(mContext).getString(KEY_LAST_PHONE, "");
             String email = SharedPreferencesUtils.getInstance(mContext).getString(KEY_LAST_EMAIL, "");
             String code = SharedPreferencesUtils.getInstance(mContext).getString(KEY_LAST_LOGIN_CODE, "");
-            Logger.e(TAG, "auto login");
             RemoteAccountManager.getInstance().login(phone, email, code, RemoteAccountManager.LOGIN_MODE_RECONNECT,
                     new RemoteCallBack.Stub() {
 
                         @Override
                         public void onSuccess(List result) {
-                            Logger.d("RemoteConnectionManager", "自动登录成功，自动重连结束。");
+                            Logger.d(TAG, "自动登录成功，自动重连结束。");
                             if (mReconnectThread != null) {
                                 mReconnectThread.mShouldStop = true;
                                 mReconnectThread.interrupt();
@@ -447,7 +442,7 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
                         public void onError(int errorCode, String reason) {
                             if (errorCode == ErrorType.ERROR_EXCEPTION_CODEINVALID || errorCode == ErrorType.ERROR_EXCEPTION_CODEERROR
                                     || errorCode == ErrorType.ERROR_EXCEPTION_OTHERLOGIN) {
-                                Logger.d("RemoteConnectionManager", "自动登录失败，终止。");
+                                Logger.d(TAG, "自动登录失败，终止。");
                                 if (mReconnectThread != null) {
                                     mReconnectThread.mShouldStop = true;
                                     mReconnectThread.interrupt();
@@ -460,7 +455,7 @@ public final class RemoteConnectionManager implements ChannelConnectionListener,
                                 Intent intent = new Intent(RemoteChatManager.getInstance().getLogoutBroadcastAction());
                                 mContext.sendOrderedBroadcast(intent, null);
                             } else {
-                                Logger.d("RemoteConnectionManager", "自动登录失败，继续。");
+                                Logger.d(TAG, "自动登录失败，继续。");
                             }
                         }
 

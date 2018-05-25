@@ -41,8 +41,6 @@ public final class RemoteInitializer {
 
     // RemoteService启动时调用该方法, 初始化时尝试登录。
     public void init(final Context context) {
-        Logger.e(TAG, "context == null ? " + (context == null));
-
         if (context == null) {
             return;
         }
@@ -54,7 +52,7 @@ public final class RemoteInitializer {
         RemoteGroupManager.getInstance().init(context);
         RemoteConversationManager.getInstance().init(context);
 
-        Logger.d(TAG, "======尝试登录------");
+        Logger.d(TAG, "---------服务进程初始化->尝试自动登录---------");
         if (RemoteAccountManager.getInstance().isLoginPermit(context)) {
             String phone = SharedPreferencesUtils.getInstance(context).getString(KEY_LAST_PHONE, "");
             String email = SharedPreferencesUtils.getInstance(context).getString(KEY_LAST_EMAIL, "");
@@ -64,11 +62,12 @@ public final class RemoteInitializer {
 
                         @Override
                         public void onSuccess(List result) {
-                            Logger.d(TAG, "----------成功发送自动登录packet-------------");
+                            Logger.d(TAG, "----------成功自动登录-------------");
                         }
 
                         @Override
                         public void onError(int errorCode, String reason) {
+                            Logger.d(TAG, "----------自动登录失败-------------" + errorCode);
                             if (errorCode == ERROR_EXCEPTION_CODEINVALID || errorCode == ErrorType.ERROR_EXCEPTION_CODEERROR
                                     || errorCode == ErrorType.ERROR_EXCEPTION_OTHERLOGIN) {
                                 RemoteChatManager.getInstance().onLoggedOut(false);
@@ -86,6 +85,6 @@ public final class RemoteInitializer {
                         }
                     });
         }
-        Logger.d(TAG, "Service is initialized");
+        Logger.d(TAG, "Service is initialized初始化完成");
     }
 }

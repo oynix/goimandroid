@@ -21,12 +21,17 @@ public class RemoteService extends Service {
 
     public void onCreate() {
         super.onCreate();
-        Logger.d(TAG, "chat service created");
+        Logger.d(TAG, "onCreate");
         RemoteInitializer.getInstance().init(this);
     }
 
+    public IBinder onBind(Intent paramIntent) {
+        Logger.d(TAG, "onBind");
+        return mBinder;
+    }
+
     public int onStartCommand(Intent paramIntent, int paramInt1, int paramInt2) {
-        Logger.d(TAG, "on start command!");
+        Logger.d(TAG, "onStartCommand!");
         return START_STICKY;
     }
 
@@ -34,11 +39,6 @@ public class RemoteService extends Service {
         Logger.d(TAG, "onDestroy");
         RemoteConnectionManager.getInstance().disconnect();
         super.onDestroy();
-    }
-
-    public IBinder onBind(Intent paramIntent) {
-        Logger.d(TAG, "onBind");
-        return mBinder;
     }
 
     public boolean onUnbind(Intent paramIntent) {

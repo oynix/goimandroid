@@ -11,7 +11,7 @@ import android.widget.EditText;
 import com.mixotc.goimandroid.MainActivity;
 import com.mixotc.goimandroid.R;
 import com.mixotc.imsdklib.AdminManager;
-import com.mixotc.imsdklib.listener.CallbackWrapper;
+import com.mixotc.imsdklib.listener.MainThreadCallbackWrapper;
 import com.mixotc.imsdklib.utils.Logger;
 
 import java.util.List;
@@ -39,7 +39,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 // use email to login
                 String account = etAccount.getText().toString();
-                AdminManager.getInstance().sendLoginCode("", account, new CallbackWrapper() {
+                AdminManager.getInstance().sendLoginCode("", account, new MainThreadCallbackWrapper() {
 
                     @Override
                     public void onMainThreadSuccess(List result) {
@@ -69,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
                     Logger.d(TAG, "输入有误，请检查!!!");
                     return;
                 }
-                AdminManager.getInstance().login("", account, code, new CallbackWrapper() {
+                AdminManager.getInstance().login("", account, code, new MainThreadCallbackWrapper() {
 
                     @Override
                     public void onMainThreadSuccess(List result) {

@@ -388,7 +388,7 @@ public class RemoteGroupManager {
         }
     }
 
-    public void getGroupsFromServer(final RemoteCallBack callBack) throws RemoteException {
+    public void getGroupsFromServer(final RemoteCallBack callBack) {
         RemoteConnectionManager.getInstance().addPacketListener(new PacketReceivedListener() {
             @Override
             public void onReceivedPacket(BasePacket pkt) {

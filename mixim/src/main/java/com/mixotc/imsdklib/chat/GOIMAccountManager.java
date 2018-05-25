@@ -158,16 +158,16 @@ public class GOIMAccountManager {
     public RemoteLoggedStatusListener mLoggedStatusListener = new RemoteLoggedStatusListener.Stub() {
         @Override
         public void onLoggedIn() {
-            Logger.d(TAG, "~~~~~~~~~~~~~~~~~~~initialize Manager Data: -- local");
+            Logger.d(TAG, "-------------------initialize Manager Data: -- local" + Thread.currentThread().getName());
             GOIMContactManager.getInstance().initData();
             GOIMGroupManager.getInstance().initData();
             GOIMConversationManager.getInstance().initData();
-            Logger.d(TAG, "~~~~~~~~~~~~~~~~~~~after initialize Manager Data: -- local");
+            Logger.d(TAG, "-------------------after initialize Manager Data: -- local");
         }
 
         @Override
         public void onLoggedOut() {
-            Logger.e(TAG, "~~~~~~~~~~~~~~~~~~~clear Manager Data: -- local");
+            Logger.d(TAG, "-------------------clear Manager Data: -- local");
             GOIMContactManager.getInstance().clear();
             GOIMGroupManager.getInstance().clear();
             GOIMConversationManager.getInstance().clear();

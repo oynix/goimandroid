@@ -11,7 +11,7 @@ import java.util.List;
  * Version  : v1.0.0
  * Describe : RemoteCallBack的包装类，将所有的回调切换到主线程执行，同时将onProgress变为可选的实现方法。
  */
-public abstract class CallbackWrapper extends RemoteCallBack.Stub {
+public abstract class MainThreadCallbackWrapper extends RemoteCallBack.Stub {
     
     private Handler mHandler = new Handler(Looper.getMainLooper());
     

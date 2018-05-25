@@ -12,6 +12,7 @@ import com.mixotc.imsdklib.connection.RemoteConnectionManager;
 import com.mixotc.imsdklib.exception.ErrorType;
 import com.mixotc.imsdklib.listener.PacketReceivedListener;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
+import com.mixotc.imsdklib.listener.RemoteCallbackAdapter;
 import com.mixotc.imsdklib.listener.RemoteConnectionListener;
 import com.mixotc.imsdklib.listener.RemoteLoggedStatusListener;
 import com.mixotc.imsdklib.packet.BasePacket;
@@ -167,76 +168,61 @@ public class RemoteAccountManager {
                     callbackOnError(callBack, ErrorType.ERROR_EXCEPTION_UNEXPECTED_RESPONSE_ERROR, reason);
                     return;
                 }
-                Logger.d(TAG, lastLoginUser.getNick() + "成功登录，开始初始化----------");
+                Logger.d(TAG, lastLoginUser.getNick() + "---------成功登录，开始初始化----------");
 
-                long friendLastUpdate = data.optLong("friend", -1);
-                long groupLastUpdate = data.optLong("group", -1);
-                final boolean updateFriend = SharedPreferencesUtils.getInstance(mContext).updateTime(KEY_UPDATE_FRIEND_TIME, friendLastUpdate);
-                final boolean updateGroup = SharedPreferencesUtils.getInstance(mContext).updateTime(KEY_UPDATE_GROUP_TIME, groupLastUpdate);
+                final boolean updateFriend = SharedPreferencesUtils.getInstance(mContext).updateTime(KEY_UPDATE_FRIEND_TIME, data.optLong("friend", -1));
+                final boolean updateGroup = SharedPreferencesUtils.getInstance(mContext).updateTime(KEY_UPDATE_GROUP_TIME, data.optLong("group", -1));
                 SharedPreferencesUtils.getInstance(mContext).putString(KEY_LAST_PHONE, phone);
                 SharedPreferencesUtils.getInstance(mContext).putString(KEY_LAST_EMAIL, email);
                 SharedPreferencesUtils.getInstance(mContext).putString(KEY_LAST_LOGIN_CODE, code);
                 SharedPreferencesUtils.getInstance(mContext).setLastLoginUser(lastLoginUser);
 
                 boolean dbExist = RemoteDBManager.initDB(mContext, lastLoginUser.getUid());
-                UserFilePathManager.getInstance().initDirs(RemoteAccountManager.getInstance().getLoginUser().getUid(), mContext);
+                UserFilePathManager.getInstance().initDirs(lastLoginUser.getUid(), mContext);
 
+                // 登录成功，增加remote manager到remote connection的监听
                 RemoteChatManager.getInstance().onLoggedIn();
+
                 // 2018/4/26
                 // 新策略按两种情况处理：
                 // 1。登录成功后本地没有该用户的IM数据库，即新账号登录：先初始化Local，再请求groups from server，完成后进入app，同时请求offline messages
                 // 2。登录成功后本地存在该用户的IM数据库，即老账号登录：初始化Local后直接进入app，然后请求offline message，
                 // 根据offline message更新数据库数据，保证本地数据库数据不会错乱(无法处理从该设备退出后，在其他设备操作过后又回到该设备)，
                 // 完成后再按需请求groups from server，同步服务器端数据库
+
                 Logger.d(TAG, "before onLoggedIn()");
-                // 通知Local登录成功,Local自动初始化数据到内存
+                // when called this method, local manager will load data to memory from database by binder.
                 onLoggedIn();
-                // 数据初始化完毕，回调Local更新UI
-                callbackOnSuccess(callBack, null);
                 Logger.d(TAG, "after onLoggedIn()");
-                final long lastMid = SharedPreferencesUtils.getInstance(mContext).getLong(KEY_LAST_MSG_ID, -1);
-//                final long lastMid = 0;
+                final long lastMid = SharedPreferencesUtils.getInstance(mContext).getLong(KEY_LAST_MSG_ID, 0);
                 if (!dbExist) {
                     Logger.d(TAG, "database not exist, request groups from server");
-                    try {
-                        // 此时Local是从一个空的数据库读取的数据，
-                        // groups from server完成后通知Local，Local会重新执行初始化从数据库读取数据
-                        RemoteGroupManager.getInstance().getGroupsFromServer(new RemoteCallBack.Stub() {
-                            @Override
-                            public void onSuccess(List result) {
-                                try {
-                                    callBack.onSuccess(result);
-                                    RemoteChatManager.getInstance().offlineMsgs(lastMid,null);
-                                } catch (RemoteException e) {
-                                    e.printStackTrace();
-                                }
-                            }
+                    // now, local manager has initialized but there is no any data in memory
+                    // after getGroupsFromServer's callback invoked, remote will call local's
+                    // listeners to initialize the data in memory.
+                    RemoteGroupManager.getInstance().getGroupsFromServer(new RemoteCallbackAdapter() {
+                        @Override
+                        public void onSuccess(List result) {
+                            callbackOnSuccess(callBack, result);
+                            RemoteChatManager.getInstance().offlineMsgs(lastMid, null);
+                        }
 
-                            @Override
-                            public void onError(int errorCode, String reason) {
-                                try {
-                                    callBack.onError(errorCode, reason);
-                                } catch (RemoteException e) {
-                                    e.printStackTrace();
-                                }
-                            }
+                        @Override
+                        public void onError(int errorCode, String reason) {
+                            callbackOnError(callBack, errorCode, reason);
+                        }
 
-                            @Override
-                            public void onProgress(int progress, String message) {
-                            }
-                        });
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
+                    });
                 } else {
-                    Logger.d(TAG, "database already exist, enter application immediately");
-                    try {
-                        callBack.onSuccess(null);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-                    Logger.d(TAG, "database already exist, request offline messages from server");
-                    RemoteChatManager.getInstance().offlineMsgs(lastMid, new RemoteCallBack.Stub() {
+                    Logger.d(TAG, "database already exists, enter application immediately");
+                    callbackOnSuccess(callBack, null);
+                    Logger.d(TAG, "database already exists, request offline messages from server");
+                    // there is a problem: the message in server is updated in real time, that mean the
+                    // group id of message is the updated, but the data in database is not before sync
+                    // from server, so when client receive a message with updated group id, there may
+                    // appear two conversation with different group id but of the same user. oh shit
+                    // FIXME: 2018/5/25 just like description above
+                    RemoteChatManager.getInstance().offlineMsgs(lastMid, new RemoteCallbackAdapter() {
 
                         @Override
                         public void onSuccess(List result) {
@@ -248,18 +234,9 @@ public class RemoteAccountManager {
                             requestGroups();
                         }
 
-                        @Override
-                        public void onProgress(int progress, String message) {
-                        }
-
                         private void requestGroups() {
-                            // 按需更新groups contacts
                             if (updateFriend || updateGroup) {
-                                try {
-                                    RemoteGroupManager.getInstance().getGroupsFromServer(null);
-                                } catch (RemoteException e) {
-                                    e.printStackTrace();
-                                }
+                                RemoteGroupManager.getInstance().getGroupsFromServer(null);
                             }
                         }
                     });
@@ -270,8 +247,6 @@ public class RemoteAccountManager {
             }
         };
 
-        Logger.d(TAG, "log in disconnect!!!!!!!!");
-        RemoteConnectionManager.getInstance().disconnect();
         RemoteConnectionListener connectionListener = new RemoteConnectionListener.Stub() {
             @Override
             public void onConnected() {
@@ -300,6 +275,7 @@ public class RemoteAccountManager {
         };
 
         RemoteConnectionManager.getInstance().addConnectionListener(connectionListener);
+        RemoteConnectionManager.getInstance().disconnect();
 
         new Thread(new Runnable() {
             @Override
@@ -334,14 +310,11 @@ public class RemoteAccountManager {
             public void onReceivedPacket(BasePacket pkt) {
                 if (pkt.getPacketType() == BasePacket.PacketType.LOGOUT_REPLY) {
                     RemoteConnectionManager.getInstance().removePacketListener(this);
+                    // 移除remote connection的监听器
                     RemoteChatManager.getInstance().onLoggedOut(false);
-                    try {
-                        callBack.onSuccess(null);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
+                    callbackOnSuccess(callBack, null);
                     onLoggedOut();
-                    Logger.e(TAG, "log out --- disconnect!!!!!!!!");
+                    Logger.d(TAG, "log out --- disconnect!!!!!!!!");
                     RemoteConnectionManager.getInstance().disconnect();
                 }
             }

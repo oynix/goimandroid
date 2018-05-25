@@ -30,11 +30,11 @@ import static com.mixotc.imsdklib.database.table.ContactTable.USER_NAME;
  * Describe : 联系人表数据操作类
  */
 
-public class IMContactTableProvider extends BaseIMTableProvider {
+public class ContactTableProvider extends BaseIMTableProvider {
 
-    private static final String TAG = IMContactTableProvider.class.getSimpleName();
+    private static final String TAG = ContactTableProvider.class.getSimpleName();
 
-    public IMContactTableProvider(Context context, String uid) {
+    public ContactTableProvider(Context context, String uid) {
         super(context, uid);
     }
 

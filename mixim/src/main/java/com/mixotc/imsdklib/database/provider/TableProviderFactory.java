@@ -14,7 +14,7 @@ import java.util.Map;
  * Describe : IMTableProvider的生产工厂类。
  */
 
-public class IMTableProviderFactory {
+public class TableProviderFactory {
 
     private Map<Class<? extends BaseIMTableProvider>, Object> mProviderCache = new HashMap<>();
     private Context mContext;
@@ -26,7 +26,7 @@ public class IMTableProviderFactory {
      * @param context context
      * @param uid     当前登录的用户UID
      */
-    public IMTableProviderFactory(Context context, String uid) {
+    public TableProviderFactory(Context context, String uid) {
         mContext = context;
         mUid = uid;
     }

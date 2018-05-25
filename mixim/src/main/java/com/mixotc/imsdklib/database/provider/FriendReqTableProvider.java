@@ -27,11 +27,11 @@ import static com.mixotc.imsdklib.database.table.FriendRequestTable.USER_ID;
  * Describe :
  */
 
-public class IMFriendReqTableProvider extends BaseIMTableProvider {
+public class FriendReqTableProvider extends BaseIMTableProvider {
 
-    private static final String TAG = IMFriendReqTableProvider.class.getSimpleName();
+    private static final String TAG = FriendReqTableProvider.class.getSimpleName();
 
-    public IMFriendReqTableProvider(Context context, String uid) {
+    public FriendReqTableProvider(Context context, String uid) {
         super(context, uid);
     }
 

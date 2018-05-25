@@ -12,6 +12,7 @@ import com.mixotc.imsdklib.chat.GOIMContactManager;
 import com.mixotc.imsdklib.chat.GOIMConversationManager;
 import com.mixotc.imsdklib.chat.GOIMGroupManager;
 import com.mixotc.imsdklib.service.RemoteService;
+import com.mixotc.imsdklib.utils.AppUtils;
 
 import static android.content.Context.BIND_AUTO_CREATE;
 
@@ -56,6 +57,9 @@ public class BindServiceHelper {
      * 将远程服务Service绑定到主进程
      */
     public void bind() {
+        if (!AppUtils.getCurrentProcessName(mContext).equals(mContext.getPackageName())) {
+            return;
+        }
         if (mServiceBinder == null) {
             Intent intent = new Intent(mContext, mServiceClass);
             // onCreate onStartCommand

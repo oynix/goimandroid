@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.mixotc.goimandroid.R;
 import com.mixotc.imsdklib.chat.GOIMContact;
+import com.mixotc.imsdklib.utils.Logger;
 
 import java.util.List;
 
@@ -24,6 +25,8 @@ import java.util.List;
  * Describe :
  */
 public class ContactActivity extends AppCompatActivity implements ContactContract.View {
+
+    private static final String TAG = ContactActivity.class.getSimpleName();
 
     private ListView mListView;
     private ContactContract.Presenter mPresenter;
@@ -77,7 +80,9 @@ public class ContactActivity extends AppCompatActivity implements ContactContrac
                 holder = (ViewHolder) convertView.getTag();
             }
             final GOIMContact contact = getItem(position);
-            Glide.with(parent.getContext()).load(contact.getAvatarUrl()).asBitmap().into(holder.mIcon);
+            String avatarUrl = contact.getAvatarUrl();
+            Logger.d(TAG, contact.getNick() + ":" + avatarUrl);
+            Glide.with(parent.getContext()).load(avatarUrl).asBitmap().into(holder.mIcon);
             holder.mName.setText(contact.getNick());
             holder.mBtnDelete.setOnClickListener(new View.OnClickListener() {
                 @Override

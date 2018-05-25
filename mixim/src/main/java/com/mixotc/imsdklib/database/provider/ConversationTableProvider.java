@@ -29,14 +29,14 @@ import static com.mixotc.imsdklib.database.table.ConversationTable.TABLE_NAME;
  * Describe :
  */
 
-public class IMConversationTableProvider extends BaseIMTableProvider {
+public class ConversationTableProvider extends BaseIMTableProvider {
 
-    private static final String TAG = IMConversationTableProvider.class.getSimpleName();
+    private static final String TAG = ConversationTableProvider.class.getSimpleName();
 
     /** 加载conversation时，没个conversation加载消息数量的默认值 */
     private static final int COUNT_OF_MESSAGE_LOADED_INIT = 20;
 
-    public IMConversationTableProvider(Context context, String uid) {
+    public ConversationTableProvider(Context context, String uid) {
         super(context, uid);
     }
 

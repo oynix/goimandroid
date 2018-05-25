@@ -19,8 +19,8 @@ import static com.mixotc.imsdklib.database.table.UnreadCountTable.TABLE_NAME;
  * Describe :
  */
 
-public class IMUnreadCountTableProvider extends BaseIMTableProvider {
-    public IMUnreadCountTableProvider(Context context, String uid) {
+public class UnreadCountTableProvider extends BaseIMTableProvider {
+    public UnreadCountTableProvider(Context context, String uid) {
         super(context, uid);
     }
 

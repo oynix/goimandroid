@@ -34,11 +34,11 @@ import static com.mixotc.imsdklib.database.table.ChatTable.TABLE_NAME;
  * Describe :
  */
 
-public class IMChatTableProvider extends BaseIMTableProvider {
+public class ChatTableProvider extends BaseIMTableProvider {
 
-    private static final String TAG = IMChatTableProvider.class.getSimpleName();
+    private static final String TAG = ChatTableProvider.class.getSimpleName();
 
-    public IMChatTableProvider(Context context, String uid) {
+    public ChatTableProvider(Context context, String uid) {
         super(context, uid);
     }
 

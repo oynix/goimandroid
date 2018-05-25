@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import static com.mixotc.imsdklib.remotechat.RemoteAccountManager.LOGIN_MODE_MANUAL;
+
 /**
  * Author   : xiaoyu
  * Date     : 2018/5/23 下午5:32
@@ -76,7 +78,7 @@ public class RemoteBinder extends RemoteServiceBinder.Stub {
 
     @Override
     public void login(String phone, String email, String code, RemoteCallBack callBack) {
-        RemoteAccountManager.getInstance().login(phone, email, code, 0, callBack);
+        RemoteAccountManager.getInstance().login(phone, email, code, LOGIN_MODE_MANUAL, callBack);
     }
 
     @Override

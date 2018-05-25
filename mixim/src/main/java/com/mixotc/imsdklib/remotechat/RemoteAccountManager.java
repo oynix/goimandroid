@@ -167,7 +167,7 @@ public class RemoteAccountManager {
                     callbackOnError(callBack, ErrorType.ERROR_EXCEPTION_UNEXPECTED_RESPONSE_ERROR, reason);
                     return;
                 }
-                Logger.d(TAG, "成功登录，开始初始化");
+                Logger.d(TAG, lastLoginUser.getNick() + "成功登录，开始初始化----------");
 
                 long friendLastUpdate = data.optLong("friend", -1);
                 long groupLastUpdate = data.optLong("group", -1);

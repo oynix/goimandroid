@@ -20,9 +20,9 @@ import com.mixotc.imsdklib.utils.Logger;
  * Describe : 用户IM操作数据库.
  */
 
-public class IMDatabaseHelper extends BaseDatabaseHelper {
+public class DatabaseHelper extends BaseDatabaseHelper {
 
-    private static final String TAG = IMDatabaseHelper.class.getSimpleName();
+    private static final String TAG = DatabaseHelper.class.getSimpleName();
 
     /**
      * 数据库名字的后缀。名字组成为$uid + 后缀名称。每个用户使用单独的数据库避免数据交错。
@@ -36,7 +36,7 @@ public class IMDatabaseHelper extends BaseDatabaseHelper {
      */
     private static final int DB_VERSION_CODE = 1;
 
-    public IMDatabaseHelper(Context context, String uid) {
+    public DatabaseHelper(Context context, String uid) {
         super(context, uid + DB_NAME_SUFFIX, DB_VERSION_CODE);
         SQLiteDatabase db;
         try {

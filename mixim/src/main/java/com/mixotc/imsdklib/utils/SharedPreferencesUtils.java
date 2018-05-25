@@ -84,6 +84,9 @@ public final class SharedPreferencesUtils {
         parcel.recycle();
     }
 
+    /**
+     * 根据传入的key值从SharedPreferences中获取value，并和传入的time对比大小，返回结果。
+     */
     public boolean updateTime(String key, long time) {
         long lastUpdateTime = mSharedPreferences.getLong(key, -1);
         if (time > lastUpdateTime) {

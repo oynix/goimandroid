@@ -2,7 +2,7 @@ package com.mixotc.imsdklib.database.provider;
 
 import android.content.Context;
 
-import com.mixotc.imsdklib.database.IMDatabaseHelper;
+import com.mixotc.imsdklib.database.DatabaseHelper;
 
 /**
  * Author   : xiaoyu
@@ -13,10 +13,10 @@ import com.mixotc.imsdklib.database.IMDatabaseHelper;
 
 public class BaseIMTableProvider {
 
-    IMDatabaseHelper mHelper;
+    DatabaseHelper mHelper;
 
     public BaseIMTableProvider(Context context, String uid) {
-        mHelper = new IMDatabaseHelper(context, uid);
+        mHelper = new DatabaseHelper(context, uid);
     }
 
     public void closeDb() {

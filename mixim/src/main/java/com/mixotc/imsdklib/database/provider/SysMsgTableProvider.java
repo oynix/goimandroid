@@ -25,11 +25,11 @@ import static com.mixotc.imsdklib.database.table.SysMsgTable.UNREAD;
  * Describe :
  */
 
-public class IMSysMsgTableProvider extends BaseIMTableProvider {
+public class SysMsgTableProvider extends BaseIMTableProvider {
 
-    private static final String TAG = IMSysMsgTableProvider.class.getSimpleName();
+    private static final String TAG = SysMsgTableProvider.class.getSimpleName();
 
-    public IMSysMsgTableProvider(Context context, String uid) {
+    public SysMsgTableProvider(Context context, String uid) {
         super(context, uid);
     }
 

@@ -27,11 +27,11 @@ import static com.mixotc.imsdklib.database.table.GroupTable.TABLE_NAME;
  * Describe :
  */
 
-public class IMGroupTableProvider extends BaseIMTableProvider {
+public class GroupTableProvider extends BaseIMTableProvider {
 
-    private static final String TAG = IMGroupTableProvider.class.getSimpleName();
+    private static final String TAG = GroupTableProvider.class.getSimpleName();
 
-    public IMGroupTableProvider(Context context, String uid) {
+    public GroupTableProvider(Context context, String uid) {
         super(context, uid);
     }
 

@@ -33,11 +33,11 @@ import static com.mixotc.imsdklib.database.table.TempContactTable.USER_NAME;
  * Describe :
  */
 
-public class IMTempContactTableProvider extends BaseIMTableProvider {
+public class TempContactTableProvider extends BaseIMTableProvider {
 
-    private static final String TAG = IMTempContactTableProvider.class.getSimpleName();
+    private static final String TAG = TempContactTableProvider.class.getSimpleName();
 
-    public IMTempContactTableProvider(Context context, String uid) {
+    public TempContactTableProvider(Context context, String uid) {
         super(context, uid);
     }
 

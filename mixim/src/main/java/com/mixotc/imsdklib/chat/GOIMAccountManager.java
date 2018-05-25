@@ -59,7 +59,6 @@ public class GOIMAccountManager {
         return false;
     }
 
-
     /**
      * 进行登录操作,登录成功会通过RemoteLoggedStatusListener回调通知
      */
@@ -159,11 +158,11 @@ public class GOIMAccountManager {
     public RemoteLoggedStatusListener mLoggedStatusListener = new RemoteLoggedStatusListener.Stub() {
         @Override
         public void onLoggedIn() {
-            Logger.e(TAG, "~~~~~~~~~~~~~~~~~~~initialize Manager Data: -- local");
+            Logger.d(TAG, "~~~~~~~~~~~~~~~~~~~initialize Manager Data: -- local");
             GOIMContactManager.getInstance().initData();
             GOIMGroupManager.getInstance().initData();
             GOIMConversationManager.getInstance().initData();
-            Logger.e(TAG, "~~~~~~~~~~~~~~~~~~~after initialize Manager Data: -- local");
+            Logger.d(TAG, "~~~~~~~~~~~~~~~~~~~after initialize Manager Data: -- local");
         }
 
         @Override

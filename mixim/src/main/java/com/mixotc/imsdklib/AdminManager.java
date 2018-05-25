@@ -12,6 +12,7 @@ import com.mixotc.imsdklib.chat.GOIMGroup;
 import com.mixotc.imsdklib.chat.GOIMGroupManager;
 import com.mixotc.imsdklib.listener.RemoteCallBack;
 import com.mixotc.imsdklib.service.RemoteService;
+import com.mixotc.imsdklib.utils.AppUtils;
 
 import java.util.Map;
 
@@ -57,15 +58,18 @@ public final class AdminManager {
     //////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 主进程application创建时进行初始化，启动远程服务service
+     * 主进程application创建时进行初始化，启动远程服务service.
+     * 只需在主进程初始化一次即可。
      * <p>
      * <note>注意:️</note>
      * 必须在{@link Application#onCreate()}中调用该方法来完成服务service的创建初始化和绑定操作
      */
     public void initOnAppCreate(Context context, Class<? extends RemoteService> service) {
-        mContext = context.getApplicationContext();
-        mBindServiceHelper = new BindServiceHelper(context, service);
-        mBindServiceHelper.bind();
+        if (AppUtils.getCurrentProcessName(context).equals(context.getPackageName())) {
+            mContext = context.getApplicationContext();
+            mBindServiceHelper = new BindServiceHelper(context, service);
+            mBindServiceHelper.bind();
+        }
     }
 
     /**
@@ -98,11 +102,26 @@ public final class AdminManager {
     }
 
     // contact
+    // 应该提供以下的几种功能：
+    // 1. 获取所有联系人
+    // 2. 根据uid获取联系人，包括该联系人可能是非好友情况
+    // 3. 根据uid判断一个用户是否是好友
+    // 4.
+
     /**
      * 获取所有联系人
      */
     public Map<Long, GOIMContact> getContacts() {
         return GOIMContactManager.getInstance().getContactList();
+    }
+
+    /**
+     * 根据user id获取联系人，
+     * @param uid
+     * @return
+     */
+    public GOIMContact getContactById(long uid) {
+        return GOIMContactManager.getInstance().getContactByUid(uid);
     }
 
     // group

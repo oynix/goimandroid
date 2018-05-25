@@ -1,4 +1,4 @@
-package com.mixotc.goimandroid;
+package com.mixotc.goimandroid.login;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.mixotc.goimandroid.MainActivity;
+import com.mixotc.goimandroid.R;
 import com.mixotc.imsdklib.AdminManager;
 import com.mixotc.imsdklib.listener.CallbackWrapper;
 import com.mixotc.imsdklib.utils.Logger;
